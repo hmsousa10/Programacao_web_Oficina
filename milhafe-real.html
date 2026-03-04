@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ficha do Milhafe-real</title>
+    <style>
+        /* Configurações de Impressão para A4 exato */
+        @page {
+            size: A4;
+            margin: 0;
+        }
+
+        /* Configurações Gerais */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            flex-direction: column;
+            align-items: center;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        .page-container {
+            background-color: white;
+            width: 210mm;
+            height: 297mm; /* Altura A4 fixa */
+            padding: 10mm 12mm; /* Margens otimizadas */
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            box-sizing: border-box;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Instruções de Impressão */
+        .print-instructions {
+            background-color: #fff3cd;
+            border: 1px solid #ffeeba;
+            color: #856404;
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            text-align: center;
+            width: 210mm;
+            box-sizing: border-box;
+            font-size: 14px;
+        }
+
+        .print-btn {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-top: 5px;
+            font-weight: bold;
+        }
+
+        .print-btn:hover { background-color: #0056b3; }
+
+        /* Título */
+        h1 {
+            text-align: center;
+            font-size: 16pt;
+            margin: 0 0 10px 0;
+            color: #333;
+            text-transform: uppercase;
+            border-bottom: 2px solid #333;
+            padding-bottom: 5px;
+        }
+
+        /* Tabela Principal Compacta */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            border: 2px solid black;
+            font-size: 8.5pt; /* Tamanho reduzido para caber o texto longo */
+            flex-grow: 1;
+        }
+
+        th, td {
+            border: 1px solid black;
+            padding: 3px 5px; /* Padding reduzido */
+            vertical-align: middle;
+        }
+
+        /* Coluna de Cabeçalhos */
+        .col-header {
+            width: 16%;
+            font-weight: bold;
+            text-align: center;
+            background-color: #f8f9fa;
+            font-size: 8pt;
+        }
+
+        /* Coluna de Conteúdo */
+        .col-content {
+            padding: 4px 6px;
+            text-align: justify;
+            line-height: 1.25; /* Entrelinhamento ajustado */
+        }
+
+        /* Taxonomia */
+        .taxonomy-table {
+            width: 100%;
+            border: none;
+            margin: 0;
+            font-size: 8pt;
+        }
+        .taxonomy-table td {
+            border: 1px solid black;
+            border-left: none;
+            border-right: none;
+            padding: 2px 4px;
+        }
+        .taxonomy-table tr:first-child td { border-top: none; }
+        .taxonomy-table tr:last-child td { border-bottom: none; }
+
+        .image-cell {
+            width: 40%;
+            text-align: center;
+            border-left: 1px solid black;
+            padding: 5px;
+            vertical-align: middle;
+        }
+
+        .species-img {
+            max-width: 100%;
+            height: auto;
+            max-height: 125px; /* Altura controlada */
+            object-fit: cover;
+            border: 1px solid #ccc;
+        }
+
+        .img-caption {
+            font-size: 7pt;
+            margin-top: 2px;
+            font-weight: bold;
+        }
+
+        /* Estado de Conservação */
+        .conservation-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+        
+        .status-svg {
+            width: 100%;
+            max-width: 200px;
+            height: auto;
+        }
+
+        /* Listas */
+        ul, ol {
+            margin: 3px 0;
+            padding-left: 18px;
+        }
+        li { margin-bottom: 2px; }
+
+        /* Rodapé */
+        .footer-note {
+            text-align: right;
+            margin-top: 5px;
+            font-size: 8pt;
+            color: #666;
+        }
+
+        /* Utilitários */
+        .bold { font-weight: bold; }
+
+        /* Impressão */
+        @media print {
+            body { padding: 0; background-color: white; display: block; }
+            .page-container {
+                width: 100%;
+                height: 100vh;
+                box-shadow: none;
+                margin: 0;
+                padding: 10mm;
+                border: none;
+            }
+            .print-instructions { display: none !important; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="print-instructions">
+    ⚠️ <b>Modo Texto Completo (1 Página):</b> Clique no botão abaixo e escolha "Guardar como PDF".<br>
+    <i>Ative "Gráficos de fundo" nas opções de impressão para manter as cores.</i><br>
+    <button class="print-btn" onclick="window.print()">🖨️ Imprimir / Guardar PDF</button>
+</div>
+
+<div class="page-container">
+    <h1>Ficha Técnica: <i>Milvus milvus</i> (Milhafe-real)</h1>
+
+    <table>
+        <tr>
+            <td class="col-header">Como está classificado?<br><br><span style="font-weight:normal; font-size: 0.85em">(segundo a Lista Vermelha)</span></td>
+            <td style="padding: 0;">
+                <div style="display: flex; height: 100%;">
+                    <div style="flex-grow: 1;">
+                        <table class="taxonomy-table">
+                            <tr><td><span class="bold">Reino:</span> ANIMALIA</td></tr>
+                            <tr><td><span class="bold">Filo:</span> CHORDATA</td></tr>
+                            <tr><td><span class="bold">Classe:</span> AVES</td></tr>
+                            <tr><td><span class="bold">Ordem:</span> ACCIPITRIFORMES</td></tr>
+                            <tr><td><span class="bold">Família:</span> ACCIPITRIDAE</td></tr>
+                            <tr><td><span class="bold">Género:</span> <i>Milvus</i></td></tr>
+                            <tr><td><span class="bold">Espécie:</span> <i>Milvus milvus</i></td></tr>
+                        </table>
+                    </div>
+                    <div class="image-cell">
+                        <img src="papagaio-real-caracteristicas.jpg" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/6/6d/Red_Kite%2C_Wales_%285856722899%29.jpg/640px-Red_Kite%2C_Wales_%285856722899%29.jpg'" alt="Milhafe-real em voo" class="species-img">
+                        <div class="img-caption">Nome comum: Milhafe-real</div>
+                    </div>
+                </div>
+            </td>
+        </tr>
+
+        <tr>
+            <td class="col-header">Estado de Conservação<br>(Corre perigo?)</td>
+            <td class="col-content">
+                <div class="conservation-wrapper">
+                    <div style="flex: 1;">
+                        Em Portugal, esta ave está numa situação muito complicada. As aves que nascem e vivem cá estão <b>Criticamente em Perigo (CR)</b>, o que significa que podem desaparecer para sempre na nossa natureza. Já as aves que vêm cá só passar o inverno estão um pouco melhor, mas mesmo assim são consideradas Vulneráveis (VU).
+                    </div>
+                    <div style="flex: 0 0 35%;">
+                        <svg viewBox="0 0 300 60" class="status-svg">
+                            <rect x="0" y="20" width="300" height="15" fill="#ddd" rx="7"/>
+                            <circle cx="250" cy="27.5" r="14" fill="#d81e05" stroke="#000" stroke-width="1.5"/>
+                            <text x="250" y="31" text-anchor="middle" fill="white" font-weight="bold" font-family="Arial" font-size="10">CR</text>
+                            <text x="10" y="50" font-size="7" font-family="Arial">LC</text>
+                            <text x="70" y="50" font-size="7" font-family="Arial">NT</text>
+                            <text x="130" y="50" font-size="7" font-family="Arial">VU</text>
+                            <text x="190" y="50" font-size="7" font-family="Arial">EN</text>
+                            <text x="250" y="10" font-size="8" font-family="Arial" fill="#d81e05" font-weight="bold">CRITICAMENTE EM PERIGO</text>
+                        </svg>
+                    </div>
+                </div>
+            </td>
+        </tr>
+
+        <tr>
+            <td class="col-header">Onde é que eles vivem?</td>
+            <td class="col-content">
+                É uma ave que vive sobretudo na Europa. Em Portugal, os que vivem cá o ano todo estão muito espalhados e encontram-se quase só perto da fronteira, no <b>Nordeste Transmontano</b>, na <b>Beira Interior</b> e uns poucos no <b>Alentejo</b>. No inverno, a população aumenta porque chegam muitos milhafres vindos do centro e norte da Europa para fugir ao frio de lá. Nessa altura, espalham-se por todo o país.
+            </td>
+        </tr>
+
+        <tr>
+            <td class="col-header">Com quem é que se parece?</td>
+            <td class="col-content">
+                É muito fácil confundi-lo com o <b>Milhafe-preto</b> (<i>Milvus migrans</i>).<br>
+                <b>Como distinguir:</b> O Milhafe-real é um bocadinho maior, tem penas mais avermelhadas (parece cor de ferrugem) e umas manchas brancas na parte de baixo das asas. A maior diferença é a sua <b>cauda em forma de "V" muito disfarçado (forcada)</b>, enquanto o Milhafe-preto tem uma cauda mais a atirar para o triângulo, quase reta.
+            </td>
+        </tr>
+
+        <tr>
+            <td class="col-header">Onde é que gosta de estar (Habitat)?</td>
+            <td class="col-content">
+                Gosta de zonas abertas, tipo campos de agricultura ou pastos para animais, mas sempre com árvores por perto. Dá-se muito bem em zonas com sobreiros ou azinheiras e nas bordas dos bosques. Precisa de árvores bem grandes e altas para fazer o ninho, mas vai caçar para os campos abertos porque aí não há obstáculos e é muito mais fácil ver as suas presas.
+            </td>
+        </tr>
+
+        <tr>
+            <td class="col-header">Como é esta ave e o que faz?</td>
+            <td class="col-content">
+                <div style="display: flex; align-items: center;">
+                    <div style="width: 70%; padding-right: 5px;">
+                        É uma ave de rapina grandota (com as asas abertas mede entre 1,45 e 1,65 metros). <br>
+                        <b>O que come:</b> Come um pouco de tudo. Adora animais mortos, mas também caça coisas pequenas como ratos, cobras, insetos ou pássaros mais novinhos. E às vezes é muito malandro: rouba a comida de outras aves!<br>
+                        <b>Comportamento:</b> Tem um voo super elegante e usa a cauda em "V" para virar, como se fosse o leme de um barco. Gosta muito de andar em grupo, principalmente no inverno, quando se juntam aos magotes para dormir na mesma árvore.
+                    </div>
+                    <div style="width: 30%; text-align: center;">
+                        <svg viewBox="0 0 100 80" style="width: 80%; border: 1px dashed #ccc;">
+                            <path d="M20,10 Q50,0 80,10 L65,70 L50,50 L35,70 Z" fill="none" stroke="black" stroke-width="2"/>
+                            <text x="50" y="78" font-size="10" text-anchor="middle">Cauda em "V"</text>
+                        </svg>
+                    </div>
+                </div>
+            </td>
+        </tr>
+
+        <tr>
+            <td class="col-header">Porque é que podem desaparecer?</td>
+            <td class="col-content">
+                A maior parte destas aves morre por causas causadas pelo ser humano:
+                <ul style="margin: 3px 0;">
+                    <li><b>Venenos ilegais:</b> Comem pedaços de carne com veneno que algumas pessoas põem no campo para matar raposas ou lobos.</li>
+                    <li><b>Venenos de ratos:</b> Às vezes caçam ratos que comeram veneno e acabam por morrer também.</li>
+                    <li><b>Postes de eletricidade:</b> Muitos chocam contra os fios ou morrem eletrocutados.</li>
+                    <li><b>Falta de espaço:</b> Há cada vez menos sítios naturais por causa da agricultura muito intensiva.</li>
+                </ul>
+            </td>
+        </tr>
+
+        <tr>
+            <td class="col-header">O que estamos a fazer para os salvar?</td>
+            <td class="col-content">
+                - <b>Luta contra os venenos:</b> Mais vigilância e uso de cães treinados para cheirar e encontrar venenos escondidos no campo.<br>
+                - <b>"Restaurantes" para aves:</b> Criação de sítios especiais onde se põe comida limpa (sem veneno) de propósito para eles comerem.<br>
+                - <b>Arranjar os fios elétricos:</b> Isolar os postes perigosos e pôr sinais coloridos nos fios para as aves os conseguirem ver de longe.<br>
+                - <b>Ajudar a natureza:</b> Incentivar uma agricultura mais amiga do ambiente para haver sempre alimento disponível para estas aves.
+            </td>
+        </tr>
+
+        <tr>
+            <td class="col-header">Onde fomos buscar a informação</td>
+            <td class="col-content">
+                <ol class="bibliography">
+                    <li>Cabral, M.J. et al. (2005). <i>Livro Vermelho dos Vertebrados de Portugal</i>. Instituto da Conservação da Natureza. Lisboa.</li>
+                    <li>ICNF - Instituto da Conservação da Natureza e das Florestas. <i>Ficha da Espécie: Milvus milvus</i>. Disponível em: <a href="https://www.icnf.pt" target="_blank">www.icnf.pt</a></li>
+                    <li>SPEA - Sociedade Portuguesa para o Estudo das Aves. <i>Milhafe-real (Milvus milvus)</i>. Disponível em: <a href="https://www.avebrasil.com" target="_blank">www.spea.pt/aves/milhafe-real</a></li>
+                    <li>Catry, P. et al. (2010). <i>Aves de Portugal: Ornitologia do Território Continental</i>. Assírio & Alvim.</li>
+                </ol>
+            </td>
+        </tr>
+
+    </table>
+    
+</div>
+
+</body>
+</html>

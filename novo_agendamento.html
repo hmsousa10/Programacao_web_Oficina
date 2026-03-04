@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <title>SGO - Novo Agendamento</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <nav class="sidebar">
+        <div class="logo">SGO Oficina</div>
+        <div class="menu">
+            <a href="dashboard.html">📊 Dashboard</a>
+            <a href="agenda.html" class="active">📅 Agenda</a>
+            <a href="clientes.html">👥 Clientes & Viaturas</a>
+            <a href="mecanico.html">🔧 Reparações (Tablet)</a>
+            <a href="faturacao.html">📄 Faturação</a>
+            <a href="index.html" style="margin-top: 50px;">🚪 Sair</a>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        
+        <header>
+            <div>
+                <h2 style="color: #a0a0a0; font-size: 14px; margin-bottom: 5px;">Agenda / Marcações</h2>
+                <h1 style="font-size: 28px; color: white;">Novo Agendamento</h1>
+            </div>
+        </header>
+
+        <div class="form-card-container">
+            
+            <form action="agenda.html">
+                
+                <div class="form-section-header">
+                    <div class="step-number">📅</div> <h3>Capacidade e Horário</h3>
+                </div>
+                
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Data do Serviço *</label>
+                        <input type="date" required style="cursor: pointer;">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Slot Horário *</label>
+                        <select required style="cursor: pointer;">
+                            <option value="" selected disabled>Escolha o intervalo...</option>
+                            <option value="09">09:00 - 10:00 (🟢 Disponível)</option>
+                            <option value="10">10:00 - 11:00 (🟢 Disponível)</option>
+                            <option value="11">11:00 - 12:00 (🟢 Disponível)</option>
+                            <option value="14" disabled>14:00 - 15:00 (🔴 Bloqueado: +3 Viaturas)</option>
+                        </select>
+                        <small style="color: #a0a0a0; font-size: 11px; margin-top: 8px;">
+                            * [cite_start]O sistema bloqueia slots com 3 viaturas[cite: 301, 272].
+                        </small>
+                    </div>
+                </div>
+
+                <div class="form-section-header">
+                    <div class="step-number">🛠️</div> <h3>Dados Técnicos</h3>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Cliente / Viatura *</label>
+                        <input type="text" list="clientes-list" placeholder="🔍 Pesquisar Matrícula, NIF ou Nome...">
+                        <datalist id="clientes-list">
+                            <option value="12-XD-34 | António Silva">
+                            <option value="AA-00-88 | Maria Santos">
+                            <option value="CC-55-DD | Pedro Gomes">
+                        </datalist>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Tipo de Serviço</label>
+                        <select>
+                            <option>Manutenção Programada (Revisão)</option>
+                            <option>Diagnóstico / Avaria Mecânica</option>
+                            <option>Inspeção / Pneus / Óleo</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label>Notas / Queixa do Cliente</label>
+                        <input type="text" placeholder="Ex: Barulho ao travar, luz do motor acesa..." style="padding: 20px;">
+                    </div>
+                </div>
+
+                <div class="btn-submit-container">
+                    <a href="agenda.html" style="color: #636e72; text-decoration: none; font-weight: bold; font-size: 14px;">Cancelar</a>
+                    <button type="submit" class="btn-large-success" onclick="alert('Agendamento criado com sucesso!')">
+                        Confirmar Agendamento ➝
+                    </button>
+                </div>
+
+            </form>
+        </div>
+    </main>
+
+</body>
+</html>

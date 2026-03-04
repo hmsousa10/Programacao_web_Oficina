@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <title>SGO - Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+    
+    <style>
+        /* Forçar Gráficos Coloridos (opcional se já estiver no CSS externo) */
+        .bar-1 { background: linear-gradient(to top, #a55eea, #8854d0) !important; opacity: 1 !important; }
+        .bar-2 { background: linear-gradient(to top, #4b7bec, #3867d6) !important; opacity: 1 !important; }
+        .bar-3 { background: linear-gradient(to top, #2d98da, #45aaf2) !important; opacity: 1 !important; }
+        .bar-4 { 
+            background: linear-gradient(to top, #2bcbba, #20bf6b) !important; 
+            box-shadow: 0 0 15px rgba(32, 191, 107, 0.4) !important; 
+            opacity: 1 !important; 
+        }
+
+        /* Forçar Botões Redondos */
+        .btn, .btn-success, .btn-primary {
+            border-radius: 50px !important;
+        }
+        
+        /* Garantir que a barra base não fica cinzenta por cima */
+        .bar { background-color: transparent; }
+    </style>
+</head>
+<body>
+
+    <nav class="sidebar">
+        <div class="logo">SGO Oficina</div>
+        <div class="menu">
+            <a href="dashboard.html" class="active">📊 Dashboard</a>
+            <a href="agenda.html">📅 Agenda</a>
+            <a href="clientes.html">👥 Clientes & Viaturas</a>
+            <a href="mecanico.html">🔧 Reparações (Tablet)</a>
+            <a href="faturacao.html">📄 Faturação</a>
+            <a href="index.html" style="margin-top: 50px;">🚪 Sair</a>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        
+        <header>
+            <div>
+                <h2 style="color: #a0a0a0; font-size: 14px;">Visão Geral</h2>
+                <h1 style="font-size: 28px;">Dashboard de Gestão</h1>
+            </div>
+            <div class="user-profile">
+                <span>Bem-vindo,</span>
+                <strong>Pedro Santos (Gerente)</strong>
+            </div>
+        </header>
+
+        <div class="kpi-grid">
+            <div class="kpi-card green">
+                <div class="kpi-header">
+                    <div>
+                        <h3>Faturação Mensal</h3>
+                        <p>€ 12,450</p>
+                    </div>
+                    <div class="kpi-icon bg-green">💰</div>
+                </div>
+                <small style="color: var(--btn-green); font-weight: bold;">▲ +12% este mês</small>
+            </div>
+
+            <div class="kpi-card blue">
+                <div class="kpi-header">
+                    <div>
+                        <h3>Viaturas em Oficina</h3>
+                        <p>8</p>
+                    </div>
+                    <div class="kpi-icon bg-blue">🚗</div>
+                </div>
+                <small style="color: #636e72;">Capacidade: 60%</small>
+            </div>
+
+            <div class="kpi-card purple">
+                <div class="kpi-header">
+                    <div>
+                        <h3>Concluídas</h3>
+                        <p>45</p>
+                    </div>
+                    <div class="kpi-icon bg-purple">🔧</div>
+                </div>
+                <small style="color: #636e72;">Total este mês</small>
+            </div>
+
+            <div class="kpi-card orange">
+                <div class="kpi-header">
+                    <div>
+                        <h3>Tempo Médio</h3>
+                        <p>2.5 Dias</p>
+                    </div>
+                    <div class="kpi-icon bg-orange">⏳</div>
+                </div>
+                <small style="color: var(--slot-orange); font-weight: bold;">⚠ Atenção necessária</small>
+            </div>
+        </div>
+
+        <div class="dashboard-bottom-section">
+            
+            <div class="chart-container">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h3 style="color: #2d3436; font-size: 16px;">Performance Semanal</h3>
+                    <select style="border: 1px solid #eee; padding: 5px 10px; border-radius: 8px; color: #666; background: #f9f9f9; cursor: pointer;">
+                        <option>Este Mês</option>
+                        <option>Últimos 3 Meses</option>
+                    </select>
+                </div>
+                
+                <div class="chart-bars">
+                    <div class="bar-wrapper">
+                        <div class="bar bar-1" style="height: 40%;"></div>
+                        <span class="bar-label">Sem 1</span>
+                    </div>
+
+                    <div class="bar-wrapper">
+                        <div class="bar bar-2" style="height: 65%;"></div>
+                        <span class="bar-label">Sem 2</span>
+                    </div>
+
+                    <div class="bar-wrapper">
+                        <div class="bar bar-3" style="height: 50%;"></div>
+                        <span class="bar-label">Sem 3</span>
+                    </div>
+
+                    <div class="bar-wrapper">
+                        <div class="bar bar-4" style="height: 85%;"></div>
+                        <span class="bar-label" style="color: #20bf6b; font-weight: bold;">Atual</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="alerts-container">
+                <h3 style="color: #2d3436; font-size: 16px; margin-bottom: 20px;">Alertas Recentes</h3>
+                
+                <div style="display: flex; flex-direction: column; gap: 15px; overflow-y: auto;">
+                    <div style="padding: 15px; background: #fff8e1; border-left: 4px solid #ffca28; border-radius: 8px;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                            <strong style="font-size: 13px; color: #ffb300;">Stock Baixo</strong>
+                            <span style="font-size: 10px; color: #999;">10:30</span>
+                        </div>
+                        <div style="font-size: 12px; color: #555;">Óleo 5W30 no mínimo.</div>
+                    </div>
+
+                    <div style="padding: 15px; background: #e0f2f1; border-left: 4px solid #00b894; border-radius: 8px;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                            <strong style="font-size: 13px; color: #00897b;">Pagamento OK</strong>
+                            <span style="font-size: 10px; color: #999;">09:15</span>
+                        </div>
+                        <div style="font-size: 12px; color: #555;">Fatura #2025/001 paga.</div>
+                    </div>
+
+                    <div style="padding: 15px; background: #ffebee; border-left: 4px solid #ef5350; border-radius: 8px;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                            <strong style="font-size: 13px; color: #c62828;">Atraso Crítico</strong>
+                            <span style="font-size: 10px; color: #999;">Ontem</span>
+                        </div>
+                        <div style="font-size: 12px; color: #555;">Box 3: +4 horas extra.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+</body>
+</html>

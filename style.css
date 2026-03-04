@@ -1,0 +1,536 @@
+/* style.css - SGO Oficina (Versão Final para Entrega) */
+
+:root {
+    /* --- 1. VARIÁVEIS (CSS VARIABLES) --- */
+    /* Permite mudar as cores do site inteiro num só sítio. 
+       Útil para consistência e manutenção. */
+    --bg-dark: #15172b;      /* Fundo Azul Escuro (Tema Dark) */
+    --card-white: #ffffff;   /* Fundo dos cartões */
+    
+    /* Tipografia */
+    --text-header: #ffffff;
+    --text-dark: #2d3436;
+    --text-grey: #a0a0a0;
+    
+    /* Cores de Destaque */
+    --primary-blue: #2979ff; /* Azul vibrante (Links ativos) */
+    --btn-green: #00b894;    /* Verde (Ações positivas) */
+    --accent: #6c5ce7;       /* Roxo (Identidade da Marca) */
+    
+    /* Cores de Estado (Slots da Agenda) */
+    --slot-blue: #3d84ff;
+    --slot-orange: #ff9f43;
+    --slot-purple: #a55eea;
+    --slot-red: #ff4757;
+    --slot-empty: #f1f2f6;
+}
+
+/* Reset Básico */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box; /* Garante que o padding não aumenta a largura dos elementos */
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Layout Flexbox: Coloca a Sidebar e o Conteúdo lado a lado */
+body {
+    background-color: var(--bg-dark);
+    color: var(--text-dark);
+    display: flex; 
+    min-height: 100vh;
+}
+
+/* =========================================
+   2. SIDEBAR (Menu Lateral)
+   ========================================= */
+.sidebar {
+    width: 260px;
+    background-color: var(--bg-dark);
+    display: flex;
+    flex-direction: column; /* Itens um por baixo do outro */
+    padding: 30px 20px;
+    position: fixed; /* Fixa no ecrã, não faz scroll */
+    height: 100%;
+    border-right: 1px solid rgba(255,255,255,0.05); /* Linha subtil */
+    z-index: 100;
+}
+
+.logo {
+    font-size: 20px;
+    font-weight: 800;
+    color: white;
+    margin-bottom: 50px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Ícone da Chave Inglesa feito com pseudo-elemento */
+.logo::before {
+    content: '🔧';
+    background: var(--accent);
+    width: 35px;
+    height: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    font-size: 18px;
+}
+
+.menu a {
+    text-decoration: none;
+    color: #8c90b5;
+    display: flex;
+    align-items: center;
+    padding: 16px 20px;
+    margin-bottom: 12px;
+    border-radius: 12px;
+    font-weight: 500;
+    transition: all 0.3s ease; /* Animação suave ao passar o rato */
+    font-size: 15px;
+}
+
+.menu a:hover {
+    color: white;
+    background-color: rgba(255,255,255,0.05);
+}
+
+.menu a.active {
+    background-color: var(--primary-blue);
+    color: white;
+    box-shadow: 0 4px 15px rgba(41, 121, 255, 0.4); /* Efeito de brilho/neon */
+    font-weight: 600;
+}
+
+/* =========================================
+   3. CONTEÚDO PRINCIPAL
+   ========================================= */
+.main-content {
+    margin-left: 260px; /* Compensa a largura da sidebar fixa */
+    flex: 1; /* Ocupa o resto do espaço disponível */
+    padding: 60px 40px 40px 40px;
+    background-color: var(--bg-dark);
+}
+
+header {
+    display: flex;
+    justify-content: space-between; /* Afasta o título do perfil */
+    align-items: flex-start;
+    margin-bottom: 30px;
+    color: white;
+}
+
+header h2 {
+    font-size: 14px;
+    color: #8c90b5;
+    font-weight: normal;
+    margin-bottom: 5px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+header h1 {
+    font-size: 28px;
+    font-weight: bold;
+    color: white;
+}
+
+.user-profile {
+    text-align: right;
+    color: #8c90b5;
+    font-size: 14px;
+}
+.user-profile strong { color: white; display: block; font-size: 16px; margin-top: 4px; }
+
+/* =========================================
+   4. COMPONENTES E BOTÕES (Design System)
+   ========================================= */
+.card {
+    background: var(--card-white);
+    border-radius: 20px;
+    padding: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2); /* Sombra elegante */
+    overflow: hidden;
+}
+
+.btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 50px; /* <--- MUDANÇA: Torna os botões redondos (pílula) */
+    cursor: pointer;
+    font-weight: bold;
+    text-decoration: none;
+    display: inline-block;
+    transition: transform 0.2s;
+}
+
+/* Botão Verde Principal (+ Novo Agendamento / Cliente) */
+.btn-success {
+    background-color: var(--btn-green);
+    color: white;
+    box-shadow: 0 4px 12px rgba(0, 184, 148, 0.3);
+    border-radius: 50px; /* <--- MUDANÇA: Formato Pílula */
+    padding: 12px 30px;  /* Mais largo */
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.btn-success:hover { transform: translateY(-2px); } /* Sobe ligeiramente ao passar o rato */
+
+.btn-primary { background-color: var(--primary-blue); color: white; border-radius: 50px; }
+.btn-secondary { background-color: #f1f2f6; color: #2d3436; border-radius: 50px; }
+
+/* Botão de Confirmação em Formulários (Grande) */
+.btn-large-success {
+    background: linear-gradient(135deg, #00b894, #00cec9);
+    color: white;
+    padding: 18px 50px;
+    border-radius: 50px; /* <--- MUDANÇA: Formato Pílula */
+    font-size: 16px;
+    font-weight: bold;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 10px 20px rgba(0, 184, 148, 0.2);
+    transition: transform 0.2s;
+}
+.btn-large-success:hover { transform: translateY(-3px); }
+
+/* =========================================
+   5. DASHBOARD (Gráficos e KPIs)
+   ========================================= */
+.kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr); /* 4 Colunas iguais */
+    gap: 25px;
+    margin-bottom: 40px;
+}
+
+.kpi-card {
+    background: white;
+    padding: 20px;
+    border-radius: 18px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 140px;
+    transition: transform 0.3s;
+}
+.kpi-card:hover { transform: translateY(-5px); }
+
+/* Linha colorida lateral (pseudo-elemento) */
+.kpi-card::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; height: 100%; width: 6px;
+}
+
+/* Classes utilitárias de cor */
+.kpi-card.green::before { background: var(--btn-green); }
+.kpi-card.blue::before { background: var(--primary-blue); }
+.kpi-card.purple::before { background: var(--slot-purple); }
+.kpi-card.orange::before { background: var(--slot-orange); }
+
+.kpi-header { display: flex; justify-content: space-between; align-items: flex-start; }
+.kpi-icon {
+    width: 40px; height: 40px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center; font-size: 20px;
+}
+.bg-green { background: rgba(0,184,148,0.1); color: var(--btn-green); }
+.bg-blue { background: rgba(41,121,255,0.1); color: var(--primary-blue); }
+.bg-purple { background: rgba(165,94,234,0.1); color: var(--slot-purple); }
+.bg-orange { background: rgba(255,159,67,0.1); color: var(--slot-orange); }
+
+.kpi-card h3 { font-size: 12px; color: #b2bec3; text-transform: uppercase; margin-bottom: 5px; }
+.kpi-card p { font-size: 26px; font-weight: 800; color: var(--text-dark); }
+
+/* --- GRÁFICOS (Barras Coloridas) --- */
+.dashboard-bottom-section { display: flex; gap: 30px; height: 400px; }
+.chart-container, .alerts-container {
+    background: white; border-radius: 20px; padding: 30px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1); display: flex; flex-direction: column;
+}
+.chart-container { flex: 2; }
+.alerts-container { flex: 1; }
+
+/* IMPORTANTE: definir altura para que a % das barras funcione */
+.chart-bars {
+    flex: 1; 
+    height: 240px;                 /* altura explícita para cálculo das barras */
+    display: flex; 
+    align-items: flex-end; 
+    justify-content: space-around;
+    gap: 12px;                     /* espaçamento entre colunas */
+    border-bottom: 2px solid #f5f6fa; 
+    padding-bottom: 10px;
+}
+
+/* Cada coluna de barra + rótulo */
+.bar-wrapper {
+    height: 100%;                  /* permite que a barra use % de altura */
+    min-width: 70px;               /* largura mínima para uma barra visível */
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+.bar-label {
+    font-size: 12px; 
+    color: #636e72;
+}
+
+/* A própria barra */
+.bar {
+    width: 100%; 
+    border-radius: 8px 8px 0 0; 
+    opacity: 0.95; 
+    transition: height 0.8s ease; 
+    background-color: transparent; /* garante que não fica cinzenta */
+    will-change: height;
+}
+
+/* !important força a cor mesmo que haja estilos inline no HTML */
+.bar-1 { background: linear-gradient(to top, #a55eea, #8854d0) !important; } /* Roxo */
+.bar-2 { background: linear-gradient(to top, #4b7bec, #3867d6) !important; } /* Azul */
+.bar-3 { background: linear-gradient(to top, #2d98da, #45aaf2) !important; } /* Ciano */
+.bar-4 { background: linear-gradient(to top, #2bcbba, #20bf6b) !important; box-shadow: 0 0 15px rgba(32, 191, 107, 0.4); } /* Verde */
+
+/* =========================================
+   6. AGENDA (Slots e Tabela)
+   ========================================= */
+.agenda-table {
+    width: 100%; border-collapse: separate; border-spacing: 0; background: white;
+}
+.agenda-table th {
+    background-color: #f4f6f9; color: #636e72; font-size: 13px;
+    font-weight: 600; text-transform: uppercase; padding: 20px;
+    border-bottom: 1px solid #eee;
+}
+.agenda-table td {
+    padding: 15px; vertical-align: top; border-bottom: 1px solid #f0f0f0;
+    border-right: 1px solid #fafafa; min-height: 120px;
+}
+.agenda-table td:first-child {
+    width: 80px; color: #636e72; font-weight: bold; border-right: 1px solid #f0f0f0;
+}
+
+.slot-card {
+    padding: 12px 15px; border-radius: 12px; color: white; font-size: 13px;
+    margin-bottom: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    display: flex; justify-content: space-between; align-items: flex-end;
+}
+.slot-blue { background: linear-gradient(135deg, #3d84ff, #2979ff); }
+.slot-orange { background: linear-gradient(135deg, #ff9f43, #ff7f50); }
+.slot-purple { background: linear-gradient(135deg, #a55eea, #8854d0); }
+
+.capacity-badge {
+    background: rgba(255,255,255,0.2); padding: 2px 8px; border-radius: 10px; font-weight: bold; font-size: 11px;
+}
+.status-full-badge {
+    background-color: var(--slot-red); color: white; text-align: center;
+    font-size: 10px; font-weight: bold; padding: 4px; border-radius: 6px; margin-bottom: 8px;
+}
+.empty-slot {
+    background-color: #f7f8fa; color: #dcdde1; padding: 8px; border-radius: 20px; text-align: center; font-size: 12px;
+}
+
+/* =========================================
+   7. FORMULÁRIOS (Novo Agendamento / Cliente)
+   ========================================= */
+.form-card-container {
+    background: white; width: 100%; max-width: 1100px; margin: 0 auto;
+    padding: 50px; border-radius: 20px; box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+}
+.form-section-header {
+    display: flex; align-items: center; gap: 15px; margin-bottom: 30px;
+    padding-bottom: 10px; border-bottom: 1px solid #eee;
+}
+.step-number {
+    background: linear-gradient(135deg, var(--accent), #8e44ad);
+    color: white; width: 35px; height: 35px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center; font-size: 18px;
+}
+.form-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 40px;
+}
+.form-group label {
+    font-size: 12px; color: #b2bec3; text-transform: uppercase; font-weight: bold;
+    margin-bottom: 10px; display: block;
+}
+.form-group input, .form-group select {
+    width: 100%; padding: 16px 20px; border: 1px solid #e0e0e0;
+    background-color: #f8f9fa; border-radius: 12px; font-size: 15px; color: #2d3436;
+    outline: none; transition: 0.3s;
+}
+.form-group input:focus, .form-group select:focus {
+    border-color: var(--accent); background-color: white;
+    box-shadow: 0 0 0 4px rgba(108, 92, 231, 0.1);
+}
+.full-width { grid-column: 1 / -1; }
+
+/* =========================================
+   8. MECÂNICO (Tablet / Touch)
+   ========================================= */
+.mechanic-view-container { display: flex; flex-direction: column; gap: 30px; }
+
+/* Hero Card (Branco) */
+.hero-job-card {
+    background: white; border-radius: 24px; overflow: hidden;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.1);
+}
+.hero-header {
+    background: linear-gradient(135deg, #2d3436 0%, #15172b 100%);
+    padding: 25px 40px; display: flex; justify-content: space-between; align-items: center; color: white;
+}
+.status-pill {
+    background: #ff7675; color: white; padding: 6px 16px; border-radius: 30px;
+    font-weight: 800; font-size: 12px; text-transform: uppercase;
+    box-shadow: 0 0 20px rgba(255, 118, 117, 0.6); animation: pulse-red 2s infinite;
+}
+.timer-badge {
+    background: rgba(0,0,0,0.3); padding: 10px 20px; border-radius: 12px;
+    font-family: 'Consolas', monospace; font-weight: bold; font-size: 18px;
+}
+
+/* Info Carro */
+.car-info-section { padding: 40px 40px 20px 40px; display: flex; justify-content: space-between; }
+.plate-badge {
+    background: #dfe6e9; color: #2d3436; padding: 8px 15px; border-radius: 8px;
+    font-family: monospace; font-weight: bold; font-size: 24px;
+    border-left: 5px solid var(--accent);
+}
+
+/* Timeline */
+.timeline-wrapper {
+    position: relative; padding: 30px 50px 50px 50px; background: #fafbfc;
+    margin-top: 20px; border-top: 1px solid #eee; border-bottom: 1px solid #eee;
+}
+.timeline-track {
+    position: absolute; top: 45px; left: 80px; right: 80px; height: 6px;
+    background: #e0e0e0; z-index: 1; border-radius: 10px;
+}
+.timeline-progress {
+    position: absolute; top: 45px; left: 80px; height: 6px;
+    background: linear-gradient(90deg, var(--accent), #a29bfe);
+    z-index: 2; border-radius: 10px; transition: width 1s ease;
+}
+.timeline-steps {
+    display: flex; justify-content: space-between; position: relative; z-index: 3;
+}
+.step-circle {
+    width: 45px; height: 45px; border-radius: 50%; margin: 0 auto 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 900; font-size: 20px; background: white; color: #b2bec3;
+    border: 4px solid #e0e0e0; font-family: Arial, sans-serif;
+}
+.step-item.completed .step-circle {
+    background: var(--accent); color: white !important; border-color: var(--accent);
+}
+.step-item.active .step-circle {
+    background: white; border-color: var(--accent); color: var(--accent);
+    box-shadow: 0 0 0 6px rgba(108, 92, 231, 0.15); transform: scale(1.1);
+}
+.step-label { font-size: 12px; font-weight: 600; color: #b2bec3; }
+.step-item.active .step-label { color: var(--text-dark); }
+
+/* Tiles (Botões Grandes Tablet) */
+.action-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 25px; padding: 40px; }
+.action-tile {
+    padding: 30px 20px; border-radius: 20px; text-align: center;
+    text-decoration: none; display: flex; flex-direction: column;
+    align-items: center; transition: transform 0.2s;
+}
+.action-tile:hover { transform: translateY(-5px); box-shadow: 0 15px 30px rgba(0,0,0,0.1); }
+.tile-diag { background: #eef2ff; color: #4a69bd; }
+.tile-parts { background: #fff8e1; color: #f39c12; }
+.tile-finish { background: #e3fcf3; color: #00b894; }
+.tile-icon { font-size: 36px; margin-bottom: 12px; }
+.tile-text { font-weight: 800; font-size: 16px; text-transform: uppercase; }
+
+/* Fila de Espera */
+.queue-section-title { color: white; opacity: 0.7; margin-bottom: 20px; font-size: 14px; text-transform: uppercase; }
+.queue-scroller { display: flex; gap: 20px; overflow-x: auto; padding-bottom: 20px; }
+.queue-card {
+    background: #2d3436; color: white; padding: 20px; border-radius: 16px;
+    min-width: 280px; border: 1px solid rgba(255,255,255,0.1); position: relative; overflow: hidden;
+}
+.queue-card::after {
+    content: ''; position: absolute; top: 0; left: 0; width: 6px; height: 100%;
+    background: var(--slot-blue);
+}
+.btn-start {
+    background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2);
+    width: 100%; padding: 12px; border-radius: 10px; font-weight: bold; margin-top: 15px; cursor: pointer;
+}
+.btn-start:hover { background: var(--primary-blue); }
+
+@keyframes pulse-red {
+    0% { box-shadow: 0 0 0 0 rgba(255, 118, 117, 0.4); }
+    70% { box-shadow: 0 0 0 10px rgba(255, 118, 117, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(255, 118, 117, 0); }
+}
+
+/* =========================================
+   9. LOGIN (Estilo Especial)
+   ========================================= */
+.login-body {
+    background: linear-gradient(135deg, #15172b 0%, #2d3436 100%);
+    height: 100vh; display: flex; align-items: center; justify-content: center;
+}
+.login-card {
+    background: white; width: 100%; max-width: 420px; padding: 50px 40px;
+    border-radius: 24px; box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    text-align: center; position: relative; overflow: hidden;
+}
+.login-card::before {
+    content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 6px;
+    background: linear-gradient(90deg, var(--accent), var(--primary-blue));
+}
+.login-logo {
+    width: 70px; height: 70px; background: linear-gradient(135deg, var(--accent), #a29bfe);
+    color: white; font-size: 32px; border-radius: 20px;
+    display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;
+    box-shadow: 0 10px 20px rgba(108, 92, 231, 0.3); transform: rotate(-10deg); transition: 0.3s;
+}
+.login-card:hover .login-logo { transform: rotate(0deg) scale(1.1); }
+.login-title { font-size: 24px; font-weight: 800; color: var(--text-dark); margin-bottom: 5px; }
+.login-subtitle { color: #b2bec3; font-size: 14px; margin-bottom: 40px; }
+.login-input-group { text-align: left; margin-bottom: 20px; }
+.login-input-group label {
+    font-size: 12px; font-weight: 700; text-transform: uppercase; color: #636e72;
+    margin-bottom: 8px; display: block; margin-left: 5px;
+}
+.login-input-group input {
+    width: 100%; padding: 16px 20px; border: 2px solid #f1f2f6; background: #f8f9fa;
+    border-radius: 12px; font-size: 15px; color: #2d3436; outline: none; transition: 0.3s;
+}
+.login-input-group input:focus {
+    border-color: var(--accent); background: white; box-shadow: 0 0 0 4px rgba(108, 92, 231, 0.1);
+}
+.btn-login {
+    width: 100%; padding: 18px; background: linear-gradient(135deg, var(--accent), #4834d4);
+    color: white; border: none; border-radius: 12px; font-size: 16px; font-weight: bold;
+    cursor: pointer; margin-top: 10px; transition: transform 0.2s;
+    box-shadow: 0 10px 20px rgba(108, 92, 231, 0.3);
+}
+.btn-login:hover { transform: translateY(-3px); }
+.forgot-password {
+    display: block; margin-top: 20px; font-size: 13px; color: #b2bec3; text-decoration: none;
+}
+
+/* Responsividade (Para Tablet e Mobile) */
+@media (max-width: 1200px) { .kpi-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 900px) { 
+    .kpi-grid { grid-template-columns: 1fr; }
+    .dashboard-bottom-section { flex-direction: column; height: auto; }
+    .form-grid { grid-template-columns: 1fr; }
+}

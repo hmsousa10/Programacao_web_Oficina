@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <title>SGO - Faturação</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <nav class="sidebar">
+        <div class="logo">SGO Oficina</div>
+        <div class="menu">
+            <a href="dashboard.html">📊 Dashboard</a>
+            <a href="agenda.html">📅 Agenda</a>
+            <a href="clientes.html">👥 Clientes & Viaturas</a>
+            <a href="mecanico.html">🔧 Reparações (Tablet)</a>
+            <a href="faturacao.html" class="active">📄 Faturação</a>
+            <a href="index.html" style="margin-top: 50px;">🚪 Sair</a>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        
+        <header>
+            <div>
+                <h2 style="color: #a0a0a0; font-size: 14px;">Financeiro / Saída</h2>
+                <h1 style="font-size: 28px; color: white;">Fecho de Obra</h1>
+            </div>
+            <div class="user-profile">
+                <span>Receção</span>
+                <strong>Maria Santos</strong>
+            </div>
+        </header>
+
+        <div class="form-card-container" style="padding: 60px;">
+            
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; padding-bottom: 20px; border-bottom: 2px dashed #eee;">
+                <span style="background: #e6fffa; color: #00b894; padding: 8px 15px; border-radius: 30px; font-weight: bold; font-size: 14px; border: 1px solid #b2f5ea;">
+                    ✅ Status: Concluído (Pronto a Entregar)
+                </span>
+                <div style="color: #b2bec3; font-size: 13px;">
+                    OR Nº: <strong>5542</strong>
+                </div>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; margin-bottom: 50px;">
+                <div>
+                    <h2 style="color: var(--accent); font-size: 24px; margin-bottom: 5px;">SGO Oficina Auto</h2>
+                    <p style="color: #636e72; font-size: 14px; line-height: 1.5;">
+                        Rua da Lusófona, 123<br>
+                        1700-000 Lisboa, Portugal<br>
+                        NIF: 500 123 456
+                    </p>
+                </div>
+                <div style="text-align: right;">
+                    <h1 style="color: #2d3436; font-size: 32px; letter-spacing: -1px;">PRÉ-FATURA</h1>
+                    <p style="font-size: 16px; color: #636e72; margin-top: 5px;"># 2025/001</p>
+                    <p style="font-size: 14px; color: #b2bec3; margin-top: 5px;">Data: <strong>06/12/2025</strong></p>
+                </div>
+            </div>
+
+            <div style="display: flex; background: #f9f9f9; padding: 25px; border-radius: 15px; margin-bottom: 40px;">
+                
+                <div style="flex: 1; padding-right: 20px; border-right: 1px solid #eee;">
+                    <h4 style="color: #b2bec3; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px;">Faturar a (Cliente)</h4>
+                    <p style="font-size: 18px; font-weight: bold; color: #2d3436;">António Silva</p>
+                    <p style="color: #636e72; font-size: 14px; margin-top: 5px;">NIF: 123 456 789</p>
+                    <p style="color: #636e72; font-size: 14px;">Lisboa, Portugal</p>
+                </div>
+
+                <div style="flex: 1; padding-left: 40px;">
+                    <h4 style="color: #b2bec3; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px;">Dados da Viatura</h4>
+                    <p style="font-size: 18px; font-weight: bold; color: #2d3436;">Ford Fiesta 1.2</p>
+                    <span style="background: #2d3436; color: white; padding: 2px 8px; border-radius: 4px; font-family: monospace; font-size: 14px;">12-XD-34</span>
+                    <span style="color: #636e72; font-size: 14px; margin-left: 10px;">124,500 km</span>
+                </div>
+            </div>
+
+            <table class="agenda-table" style="margin-bottom: 30px;">
+                <thead>
+                    <tr>
+                        <th style="text-align: left; background: white; border-bottom: 2px solid #eee;">Descrição do Serviço / Peça</th>
+                        <th style="width: 100px; background: white; border-bottom: 2px solid #eee;">Qtd.</th>
+                        <th style="width: 120px; background: white; border-bottom: 2px solid #eee;">Preço Un.</th>
+                        <th style="width: 120px; background: white; border-bottom: 2px solid #eee; text-align: right;">Total Líquido</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="text-align: left;"><strong>Óleo Sintético 5W30</strong> <span style="font-size: 11px; color: #999;">(Peças)</span></td>
+                        <td>4</td>
+                        <td>€ 15.00</td>
+                        <td style="text-align: right; font-weight: bold;">€ 60.00</td>
+                    </tr>
+                    <tr>
+                        <td style="text-align: left;"><strong>Filtro de Óleo Bosch</strong> <span style="font-size: 11px; color: #999;">(Peças)</span></td>
+                        <td>1</td>
+                        <td>€ 12.50</td>
+                        <td style="text-align: right; font-weight: bold;">€ 12.50</td>
+                    </tr>
+                    <tr>
+                        <td style="text-align: left;"><strong>Mão de Obra Técnica</strong> <span style="font-size: 11px; color: #999;">(Serviço)</span></td>
+                        <td>1.5 h</td>
+                        <td>€ 35.00</td>
+                        <td style="text-align: right; font-weight: bold;">€ 52.50</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div style="display: flex; justify-content: flex-end;">
+                <div style="width: 300px;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px; color: #636e72;">
+                        <span>Subtotal Ilíquido:</span>
+                        <span>€ 125.00</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 20px; color: #636e72; padding-bottom: 20px; border-bottom: 1px solid #eee;">
+                        <span>IVA (23%):</span>
+                        <span>€ 28.75</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span style="font-size: 18px; font-weight: bold; color: #2d3436;">Total a Pagar</span>
+                        <span style="font-size: 32px; font-weight: 800; color: var(--accent);">€ 153.75</span>
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-top: 60px; padding-top: 30px; border-top: 1px solid #eee;">
+                
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div style="font-size: 11px; color: #b2bec3; max-width: 50%;">
+                        <p>ℹ️ <strong>Informação Legal (DL 84/2021):</strong> O registo de saída (Checkout) inicia a contagem do prazo de garantia das peças aplicadas (3 anos).</p>
+                    </div>
+
+                    <div style="display: flex; gap: 15px;">
+                        <button class="btn" style="background: #f1f2f6; color: #2d3436; font-weight: bold; border: 1px solid #dfe6e9;">
+                            🖨️ Imprimir
+                        </button>
+                        <button class="btn-large-success" onclick="alert('Checkout efetuado! Garantia registada.')" style="padding: 12px 30px; font-size: 14px;">
+                            Confirmar Pagamento e Saída ➝
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+</body>
+</html>
