@@ -2,6 +2,7 @@ package com.oficina.sgo.service;
 
 import com.oficina.sgo.dto.request.LoginRequest;
 import com.oficina.sgo.dto.response.AuthResponse;
+import com.oficina.sgo.exception.ResourceNotFoundException;
 import com.oficina.sgo.model.User;
 import com.oficina.sgo.repository.UserRepository;
 import com.oficina.sgo.security.JwtTokenProvider;
@@ -25,7 +26,7 @@ public class AuthService {
         );
         String token = jwtTokenProvider.generateToken(authentication);
         User user = userRepository.findByUsername(request.username())
-                .orElseThrow(() -> new RuntimeException("Data inconsistency: authenticated user not found in repository"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found after authentication: " + request.username()));
         return new AuthResponse(token, "Bearer", user.getId(), user.getUsername(), user.getName(), user.getRole().name());
     }
 }

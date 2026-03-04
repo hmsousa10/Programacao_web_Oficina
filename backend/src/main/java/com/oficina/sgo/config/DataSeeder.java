@@ -28,7 +28,8 @@ public class DataSeeder implements CommandLineRunner {
                     .active(true)
                     .build();
             userRepository.save(admin);
-            log.info("Initial MANAGER user created: admin/admin123");
+            log.warn("SECURITY: Initial MANAGER user created with default credentials (admin/admin123). " +
+                     "Change this password immediately in production!");
         }
     }
 }
