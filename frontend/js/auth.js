@@ -84,5 +84,6 @@ function initProtectedPage(requiredRoles) {
   populateSidebarUser();
   setActiveSidebarLink();
   initMobileSidebar();
+  initThemeToggle();
   return true;
 }
