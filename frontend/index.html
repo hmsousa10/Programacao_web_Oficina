@@ -8,6 +8,16 @@
 </head>
 <body class="login-page">
 
+  <!-- Theme Toggle -->
+  <div class="login-theme-toggle">
+    <span class="theme-toggle-icon">☀️</span>
+    <label class="theme-switch" title="Alternar tema claro/escuro">
+      <input type="checkbox" class="theme-checkbox" aria-label="Alternar tema">
+      <span class="theme-slider"></span>
+    </label>
+    <span class="theme-toggle-icon">🌙</span>
+  </div>
+
   <div class="login-card">
     <div class="login-header">
       <div class="login-logo">🔧</div>
@@ -49,6 +59,7 @@
   <script defer>
     // If already logged in, redirect to appropriate page
     document.addEventListener('DOMContentLoaded', () => {
+      initThemeToggle();
       const token = sessionStorage.getItem('sgo_token');
       const user  = sessionStorage.getItem('sgo_user');
       if (token && user) {

@@ -175,6 +175,35 @@ function getInitials(name) {
   return name.split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase();
 }
 
+/* ── Theme Toggle (Light/Dark) ── */
+function initThemeToggle() {
+  const saved = localStorage.getItem('sgo_theme');
+  if (saved === 'dark') {
+    document.documentElement.setAttribute('data-theme', 'dark');
+  }
+  document.querySelectorAll('.theme-checkbox').forEach(cb => {
+    cb.checked = saved === 'dark';
+    cb.addEventListener('change', function () {
+      const theme = this.checked ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', theme);
+      localStorage.setItem('sgo_theme', theme);
+      document.querySelectorAll('.theme-checkbox').forEach(other => {
+        other.checked = this.checked;
+      });
+    });
+  });
+}
+
+function applyStoredTheme() {
+  const saved = localStorage.getItem('sgo_theme');
+  if (saved === 'dark') {
+    document.documentElement.setAttribute('data-theme', 'dark');
+  }
+}
+
+// Apply theme immediately on load (before DOMContentLoaded)
+applyStoredTheme();
+
 /* ── Sidebar active link ── */
 function setActiveSidebarLink() {
   const page = window.location.pathname.split('/').pop() || 'index.html';
