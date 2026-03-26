@@ -1,6 +1,6 @@
 # Sistema de Gestão de Oficina (SGO)
 
-Sistema completo de gestão de oficina automóvel com backend Java (Spring Boot) e frontend web (HTML5 + CSS3 + JavaScript puro).
+Sistema completo de gestão de oficina automóvel. Backend Jakarta Servlet + Hibernate (sem Spring Boot), deployável em Tomcat 10.1. Frontend web (HTML5 + CSS3 + JavaScript puro) integrado no WAR.
 
 ---
 
@@ -11,15 +11,14 @@ Sistema completo de gestão de oficina automóvel com backend Java (Spring Boot)
 3. [Estrutura do Projeto](#estrutura-do-projeto)
 4. [Pré-requisitos](#pré-requisitos)
 5. [Configuração da Base de Dados](#configuração-da-base-de-dados)
-6. [Configuração no Eclipse (Windows)](#configuração-no-eclipse-windows)
-7. [Correr o Backend](#correr-o-backend)
-8. [Correr o Frontend](#correr-o-frontend)
+6. [Build do Projeto](#build-do-projeto)
+7. [Deploy no Tomcat](#deploy-no-tomcat)
+8. [Variáveis de Ambiente](#variáveis-de-ambiente)
 9. [Perfis de Utilizador](#perfis-de-utilizador)
 10. [Funcionalidades Principais](#funcionalidades-principais)
 11. [API REST](#api-rest)
 12. [Segurança e Autenticação](#segurança-e-autenticação)
 13. [Regras de Negócio](#regras-de-negócio)
-14. [Roadmap](#roadmap)
 
 ---
 
@@ -36,14 +35,15 @@ O sistema suporta **três perfis de utilizador**:
 
 ## Tecnologias Utilizadas
 
-| Camada     | Tecnologia                                          |
-|------------|-----------------------------------------------------|
-| Backend    | Java 17, Spring Boot 3.2.5                         |
-| ORM        | Spring Data JPA + Hibernate                         |
-| Segurança  | Spring Security + JWT (JJWT 0.11.5)                |
-| Base Dados | MySQL 8                                             |
-| Build      | Maven                                               |
-| Frontend   | HTML5, CSS3 (Grid & Flexbox), JavaScript ES6+ puro |
+| Camada     | Tecnologia                                             |
+|------------|--------------------------------------------------------|
+| Backend    | Java 17, Jakarta Servlet 6.0 (Tomcat 10.1)            |
+| ORM        | Hibernate 6.4 (JPA 3.0)                               |
+| Pool       | HikariCP 5.1                                          |
+| Segurança  | JWT (JJWT 0.11.5) + BCrypt (jBCrypt 0.4)              |
+| Base Dados | MySQL 8                                               |
+| Build      | Maven (empacota como WAR)                             |
+| Frontend   | HTML5, CSS3 (Grid & Flexbox), JavaScript ES6+ puro    |
 
 ---
 
@@ -53,186 +53,159 @@ O sistema suporta **três perfis de utilizador**:
 Programacao_web_Oficina/
 ├── database/
 │   └── init.sql                    # Script SQL de inicialização da BD
-├── backend/                        # Spring Boot API
+├── backend/                        # Aplicação Jakarta Servlet (WAR)
 │   ├── pom.xml
 │   └── src/main/
 │       ├── java/com/oficina/sgo/
-│       │   ├── SgoApplication.java
-│       │   ├── config/             # SecurityConfig, DataSeeder
-│       │   ├── security/           # JWT filter, UserDetailsService
-│       │   ├── controller/         # REST controllers
-│       │   ├── service/            # Business logic
-│       │   ├── repository/         # JPA repositories
-│       │   ├── model/              # JPA entities
-│       │   ├── dto/                # Request/Response DTOs
-│       │   └── exception/          # Global exception handler
-│       └── resources/
-│           ├── application.properties
-│           ├── application-dev.properties
-│           └── application-prod.properties
-└── frontend/                       # Static web app
-    ├── index.html                  # Login
-    ├── dashboard.html              # Dashboard (Gerente)
-    ├── agenda.html                 # Agenda semanal (Receção)
-    ├── mecanico.html               # Painel do Mecânico
-    ├── clientes.html               # Gestão de Clientes
-    ├── viaturas.html               # Gestão de Viaturas
-    ├── reparacoes.html             # Ordens de Reparação
-    ├── pecas.html                  # Stock de Peças
-    ├── css/styles.css
-    └── js/
-        ├── api.js                  # Fetch wrapper com autenticação
-        ├── auth.js                 # Login/logout/token management
-        ├── utils.js                # Utilitários partilhados
-        ├── dashboard.js
-        ├── agenda.js
-        ├── mecanico.js
-        ├── clientes.js
-        ├── viaturas.js
-        ├── reparacoes.js
-        └── pecas.js
+│       │   ├── dao/                # DAOs com EntityManager (Hibernate)
+│       │   ├── dto/                # Request/Response DTOs (Java records)
+│       │   ├── exception/          # Exceções de negócio
+│       │   ├── filter/             # CorsFilter, JwtFilter
+│       │   ├── listener/           # AppContextListener (bootstrap)
+│       │   ├── model/              # Entidades JPA
+│       │   ├── security/           # JwtTokenProvider
+│       │   ├── service/            # Lógica de negócio
+│       │   ├── servlet/            # HttpServlets (API REST)
+│       │   └── util/               # PasswordUtil
+│       ├── resources/
+│       │   └── META-INF/
+│       │       └── persistence.xml # Configuração Hibernate/JPA
+│       └── webapp/
+│           ├── WEB-INF/
+│           │   └── web.xml         # Configuração Servlet
+│           ├── index.html          # Login
+│           ├── dashboard.html
+│           ├── agenda.html
+│           ├── clientes.html
+│           ├── viaturas.html
+│           ├── reparacoes.html
+│           ├── pecas.html
+│           ├── mecanico.html
+│           ├── css/styles.css
+│           └── js/                 # JavaScript da aplicação
+└── frontend/                       # Fonte dos ficheiros frontend
 ```
 
 ---
 
 ## Pré-requisitos
 
-- **Java 17** ou superior ([download](https://adoptium.net/))
-- **Maven 3.6+** (incluído no Eclipse IDE for Enterprise Java; ou [download](https://maven.apache.org/download.cgi))
+- **Java 17** ou superior ([Adoptium Temurin](https://adoptium.net/))
+- **Maven 3.6+** ([download](https://maven.apache.org/download.cgi))
 - **MySQL 8.0+** ([MySQL Community Server](https://dev.mysql.com/downloads/mysql/))
-- **MySQL Workbench 8.0** (opcional, mas recomendado — [download](https://dev.mysql.com/downloads/workbench/))
-- Um browser moderno (Chrome, Firefox, Edge) para o frontend
+- **Apache Tomcat 10.1+** ([download](https://tomcat.apache.org/download-10.cgi))
 
-> ⚠️ **Nota sobre o MySQL Connector:** Este projeto usa **Maven** para gerir todas as dependências, incluindo o `mysql-connector-j`. **Não** é necessário adicionar manualmente nenhum ficheiro `.jar` ao projeto — o Maven descarrega o conector automaticamente ao compilar.
+> ⚠️ **Importante:** Use **Tomcat 10.1** (Jakarta EE 10). Tomcat 9.x usa a API `javax.*` que é incompatível.
 
 ---
 
 ## Configuração da Base de Dados
 
-### 1. Inicializar a base de dados com o MySQL Workbench
+### 1. Criar a base de dados
 
-1. Abre o **MySQL Workbench** e liga-te ao teu servidor local (geralmente `localhost:3306`).
-2. Abre o ficheiro `database/init.sql` (incluído no repositório) via **File → Open SQL Script…** e executa-o (⚡ ou `Ctrl+Shift+Enter`).
-   - Isto cria a base de dados `sgo_db` com o charset correto.
-   - As tabelas são criadas automaticamente pelo Hibernate quando o backend arranca pela primeira vez.
-3. Alternativamente, cola e executa o seguinte SQL no editor:
-   ```sql
-   CREATE DATABASE IF NOT EXISTS sgo_db
-       CHARACTER SET utf8mb4
-       COLLATE utf8mb4_unicode_ci;
-   ```
+No MySQL (Workbench ou linha de comando):
 
-### 2. Configurar as credenciais da base de dados
-
-Edita `backend/src/main/resources/application.properties` com o utilizador e password que definiste ao instalar o MySQL:
-
-```properties
-spring.datasource.url=jdbc:mysql://localhost:3306/sgo_db?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
-spring.datasource.username=root
-spring.datasource.password=A_TUA_PASSWORD_AQUI
+```sql
+CREATE DATABASE IF NOT EXISTS sgo_db
+    CHARACTER SET utf8mb4
+    COLLATE utf8mb4_unicode_ci;
 ```
 
-> Por omissão, o utilizador é `root` e a password é a que definiste durante a instalação do MySQL. Se criaste um utilizador dedicado, usa essas credenciais.
+Ou executa o script incluído:
+```bash
+mysql -u root -p < database/init.sql
+```
 
-### Variáveis de Ambiente (produção)
+### 2. Configurar credenciais
 
-Para produção, define estas variáveis de ambiente em vez de editar o ficheiro:
+As credenciais são passadas via **variáveis de ambiente** (ver secção abaixo). Por omissão:
 
-| Variável            | Descrição                      |
-|---------------------|--------------------------------|
-| `DB_URL`            | URL JDBC da base de dados      |
-| `DB_USERNAME`       | Utilizador da BD               |
-| `DB_PASSWORD`       | Password da BD                 |
-| `JWT_SECRET`        | Chave secreta para JWT         |
-| `CORS_ORIGINS`      | Origens permitidas (CORS)      |
+| Propriedade   | Valor padrão                                |
+|---------------|---------------------------------------------|
+| DB_URL        | `jdbc:mysql://localhost:3306/sgo_db?...`    |
+| DB_USERNAME   | `root`                                      |
+| DB_PASSWORD   | `password`                                  |
 
----
-
-## Configuração no Eclipse (Windows)
-
-Esta secção guia-te passo a passo para abrir e correr o projeto no **Eclipse IDE for Enterprise Java and Web Developers** em Windows.
-
-### 1. Instalar o Eclipse
-
-1. Descarrega o **Eclipse IDE for Enterprise Java and Web Developers** em [https://www.eclipse.org/downloads/](https://www.eclipse.org/downloads/).
-2. Instala e abre o Eclipse.
-
-> O Eclipse para Enterprise Java já inclui suporte Maven (plugin **m2e**) integrado. **Não precisas de instalar Maven separadamente** nem de adicionar o `mysql-connector-j.jar` manualmente — o Maven descarrega tudo automaticamente.
-
-### 2. Importar o projeto como projeto Maven
-
-1. No Eclipse, vai a **File → Import…**
-2. Expande **Maven** e seleciona **Existing Maven Projects** → **Next**
-3. Em **Root Directory**, clica em **Browse…** e seleciona a pasta `backend` dentro do repositório clonado (ex.: `C:\Users\hugom\Programacao_web_Oficina\backend`)
-4. Confirma que `pom.xml` aparece na lista → clica **Finish**
-5. O Eclipse vai descarregar automaticamente todas as dependências (incluindo o MySQL Connector) do Maven Central. Aguarda até o progresso na barra inferior terminar.
-
-### 3. Configurar as credenciais da base de dados
-
-1. No **Project Explorer**, abre `src/main/resources/application.properties`
-2. Altera a linha da password para a password do teu MySQL:
-   ```properties
-   spring.datasource.password=A_TUA_PASSWORD_AQUI
-   ```
-   Se o teu utilizador MySQL não for `root`, altera também `spring.datasource.username`.
-
-### 4. Correr o backend a partir do Eclipse
-
-**Opção A – Run as Spring Boot App (mais simples):**
-
-1. No **Project Explorer**, clica com o botão direito em `SgoApplication.java` (em `src/main/java/com/oficina/sgo/`)
-2. Seleciona **Run As → Spring Boot App**
-3. Verifica na consola do Eclipse que aparece: `Started SgoApplication` e `Tomcat started on port 8080`
-
-**Opção B – Run as Java Application:**
-
-1. Clica com o botão direito em `SgoApplication.java`
-2. Seleciona **Run As → Java Application**
-
-**Opção C – Via Maven no Eclipse:**
-
-1. Clica com o botão direito na raiz do projeto no **Project Explorer**
-2. Seleciona **Run As → Maven build…**
-3. Em **Goals**, escreve: `spring-boot:run`
-4. Clica **Run**
-
-### 5. Verificar que está a funcionar
-
-Abre o browser e vai a [http://localhost:8080](http://localhost:8080). Se o frontend estiver na pasta `static`, deverá aparecer a página de login.
-
-### Resolução de Problemas Comuns no Eclipse
-
-| Problema | Solução |
-|----------|---------|
-| Erros vermelhos após importar | Clica com o botão direito no projeto → **Maven → Update Project** (Alt+F5) |
-| `Access denied for user 'root'@'localhost'` | Verifica a password em `application.properties` |
-| `Unknown database 'sgo_db'` | Executa o script `database/init.sql` no MySQL Workbench |
-| `Communications link failure` | Confirma que o serviço MySQL está a correr (Windows Services → MySQL80 → Start) |
-| Porta 8080 já em uso | Altera `server.port=8081` em `application.properties` |
-| Java 17 não encontrado | Vai a **Window → Preferences → Java → Installed JREs** e adiciona o JDK 17 |
+> As tabelas são criadas automaticamente pelo Hibernate na primeira execução (`hbm2ddl.auto=update`).
 
 ---
 
-## Correr o Backend
+## Build do Projeto
 
 ```bash
 cd backend
 
-# Compilar e correr com Maven
-./mvnw spring-boot:run
+# Gerar o WAR
+mvn clean package
 
-# Ou com Maven instalado globalmente
-mvn spring-boot:run
-
-# Para um ambiente específico (dev/prod)
-mvn spring-boot:run -Dspring-boot.run.profiles=dev
+# O WAR é gerado em:
+# backend/target/sgo.war
 ```
 
-O servidor inicia em **http://localhost:8080**.
+---
 
-### Utilizador Inicial (seed)
+## Deploy no Tomcat
 
-Na primeira execução, o `DataSeeder` cria automaticamente um utilizador administrador:
+### Opção A: Deploy automático (pasta webapps)
+
+1. Copia `backend/target/sgo.war` para `TOMCAT_HOME/webapps/`
+2. Arranca (ou reinicia) o Tomcat:
+   ```bash
+   # Linux/Mac
+   $TOMCAT_HOME/bin/startup.sh
+
+   # Windows
+   %TOMCAT_HOME%\bin\startup.bat
+   ```
+3. Abre o browser: **http://localhost:8080/sgo/**
+
+### Opção B: Deploy como ROOT (contexto raiz)
+
+Para aceder diretamente em `http://localhost:8080/` sem o prefixo `/sgo`:
+
+```bash
+cp backend/target/sgo.war $TOMCAT_HOME/webapps/ROOT.war
+```
+
+### Variáveis de Ambiente no Tomcat
+
+Para definir as variáveis de ambiente, edita `TOMCAT_HOME/bin/setenv.sh` (Linux/Mac) ou `setenv.bat` (Windows):
+
+**setenv.sh:**
+```bash
+export DB_URL="jdbc:mysql://localhost:3306/sgo_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true"
+export DB_USERNAME="root"
+export DB_PASSWORD="a_tua_password"
+export JWT_SECRET="uma-chave-secreta-longa-minimo-32-caracteres-aqui"
+```
+
+**setenv.bat:**
+```bat
+set DB_URL=jdbc:mysql://localhost:3306/sgo_db?useSSL=false^&serverTimezone=UTC^&allowPublicKeyRetrieval=true
+set DB_USERNAME=root
+set DB_PASSWORD=a_tua_password
+set JWT_SECRET=uma-chave-secreta-longa-minimo-32-caracteres-aqui
+```
+
+---
+
+## Variáveis de Ambiente
+
+| Variável        | Descrição                                | Padrão (desenvolvimento)                     |
+|-----------------|------------------------------------------|----------------------------------------------|
+| `DB_URL`        | URL JDBC da base de dados                | `jdbc:mysql://localhost:3306/sgo_db?...`      |
+| `DB_USERNAME`   | Utilizador MySQL                         | `root`                                       |
+| `DB_PASSWORD`   | Password MySQL                           | `password`                                   |
+| `JWT_SECRET`    | Chave secreta JWT (mín. 32 caracteres)   | valor padrão de dev (alterar em produção!)   |
+| `JWT_EXPIRATION`| Expiração do token JWT (ms)              | `86400000` (24 horas)                        |
+
+> ⚠️ **Segurança:** Altera SEMPRE `JWT_SECRET` e `DB_PASSWORD` em produção.
+
+---
+
+## Utilizador Inicial
+
+Na primeira execução (sem utilizadores na BD), é criado automaticamente:
 
 | Campo      | Valor        |
 |------------|--------------|
@@ -240,36 +213,7 @@ Na primeira execução, o `DataSeeder` cria automaticamente um utilizador admini
 | Password   | `admin123`   |
 | Role       | `MANAGER`    |
 
-> ⚠️ **Importante:** Altera a password do utilizador `admin` imediatamente após o primeiro login em produção.
-
----
-
-## Correr o Frontend
-
-O frontend é composto por ficheiros estáticos que podem ser servidos de duas formas:
-
-### Opção 1: Servir via Spring Boot (recomendado)
-
-Coloca os ficheiros do `frontend/` em `backend/src/main/resources/static/` e o Spring Boot serve-os automaticamente em `http://localhost:8080/`.
-
-### Opção 2: Servidor HTTP simples (desenvolvimento)
-
-```bash
-cd frontend
-
-# Com Python
-python3 -m http.server 3000
-
-# Com Node.js (npx)
-npx serve .
-
-# Com PHP
-php -S localhost:3000
-```
-
-Abre o browser em **http://localhost:3000**.
-
-> **Nota:** Certifica-te que o backend está a correr em `http://localhost:8080` antes de abrir o frontend.
+> ⚠️ **Importante:** Altera a password imediatamente após o primeiro login em produção.
 
 ---
 
@@ -281,8 +225,6 @@ Abre o browser em **http://localhost:3000**.
 | `RECEPTION` | Agenda, clientes, viaturas, reparações, peças                          |
 | `MECHANIC`  | Painel do mecânico (apenas reparações atribuídas ao próprio)           |
 
-Após login, o utilizador é automaticamente redirecionado para a página correspondente ao seu perfil.
-
 ---
 
 ## Funcionalidades Principais
@@ -290,45 +232,30 @@ Após login, o utilizador é automaticamente redirecionado para a página corres
 ### Dashboard (Gerente)
 - KPIs: faturação diária/semanal/mensal
 - Reparações em curso e concluídas hoje
-- Ocupação da oficina: **X/8 viaturas** com barra de progresso visual
+- Ocupação da oficina: **X/8 viaturas**
 - Alertas de stock baixo
 - Gestão de utilizadores do sistema
 
 ### Agenda Semanal (Receção)
 - Visualização tipo calendário (segunda a sábado, 8h–18h)
-- Cor dos slots por ocupação:
-  - 🟢 Verde: 0/3 reparações
-  - 🟡 Amarelo: 1–2/3 reparações
-  - 🔴 Vermelho: 3/3 (CHEIO)
+- Máximo de 3 reparações por slot horário
 - Criar/editar/cancelar marcações
-- Navegação entre semanas
 
 ### Painel do Mecânico
-- Lista de reparações atribuídas (pendentes/em execução)
-- **Cronómetro HH:MM:SS** por operação (start/stop/reset)
-- Checklist de diagnóstico interativa
-- Requisição de peças com aviso de stock baixo
-- Conclusão de trabalho com validação
+- Lista de reparações atribuídas
+- Cronómetro por operação
+- Requisição de peças
+- Conclusão de trabalho
 
-### Gestão de Clientes
+### Gestão de Clientes, Viaturas, Stock de Peças
 - CRUD completo com pesquisa
-- Histórico de viaturas e reparações por cliente
-
-### Gestão de Viaturas
-- CRUD com pesquisa por matrícula
-- Histórico de intervenções
-
-### Gestão de Stock de Peças
-- CRUD de peças com referência, stock atual e stock mínimo
-- Entradas/saídas de stock
-- Alertas de stock abaixo do mínimo
-- Histórico de movimentos
+- Histórico de reparações
 
 ---
 
 ## API REST
 
-Base URL: `http://localhost:8080/api`
+Base URL: `http://localhost:8080/sgo/api`
 
 | Recurso          | Endpoint                              | Métodos              |
 |------------------|---------------------------------------|----------------------|
@@ -337,8 +264,8 @@ Base URL: `http://localhost:8080/api`
 | Clientes         | `/clientes`                           | GET, POST, PUT, DELETE |
 | Viaturas         | `/viaturas`                           | GET, POST, PUT, DELETE |
 | Agenda           | `/agenda`, `/agenda/semana/{data}`    | GET, POST, PUT, DELETE |
-| Reparações       | `/reparacoes`                         | GET, POST, PUT, DELETE |
-| Operações        | `/reparacoes/{id}/operacoes`          | GET, POST, PUT       |
+| Reparações       | `/reparacoes`                         | GET, POST, PUT       |
+| Operações        | `/reparacoes/{id}/operacoes`          | POST, PUT            |
 | Peças            | `/pecas`                              | GET, POST, PUT, DELETE |
 | Dashboard KPIs   | `/dashboard/kpis`                     | GET                  |
 
@@ -351,44 +278,35 @@ Authorization: Bearer <JWT_TOKEN>
 
 ## Segurança e Autenticação
 
-- **JWT Stateless**: tokens com validade de 24 horas.
+- **JWT Stateless**: tokens com validade configurável (padrão 24 horas).
 - **BCrypt**: passwords armazenadas com hash BCrypt.
 - **RBAC**: controlo de acesso baseado em roles (MANAGER, RECEPTION, MECHANIC).
-- **CORS**: configurável via propriedade `cors.allowed-origins` (por omissão `*` em desenvolvimento).
-- **CSRF**: desativado (não aplicável para API REST com JWT Bearer tokens).
-- O token JWT é armazenado em `sessionStorage` no browser (limpo ao fechar o separador).
+- **CORS**: permitido de qualquer origem (`*`) — configurável no `CorsFilter`.
+- O token JWT é armazenado em `sessionStorage` no browser.
 
 ---
 
 ## Regras de Negócio
 
 ### Capacidade da Agenda
-- **Máximo de 3 reparações por slot horário** — validado no `AgendaService`. Retorna HTTP 409 com mensagem clara se excedido.
+- **Máximo de 3 reparações por slot horário** — retorna HTTP 409 se excedido.
 
 ### Capacidade da Oficina
-- **Máximo de 8 viaturas em simultâneo** — validado no `ReparacaoService` ao iniciar uma reparação. Retorna HTTP 409 se excedido.
+- **Máximo de 8 viaturas em simultâneo** — retorna HTTP 409 se excedido.
 
 ### Modelo Cliente–Viatura
 - Relação 1:N (um cliente, múltiplas viaturas).
-- Matrícula única — validada no `ViaturaService`.
-- Não é permitido registar uma viatura sem cliente associado.
-
-### Rastreabilidade de Reparações
-- Cada reparação regista: mecânico responsável, lista de operações com tempos, peças consumidas, valor total.
-- Histórico completo consultável por reparação, viatura ou cliente.
+- Matrícula única.
 
 ---
 
-## Roadmap
+## Resolução de Problemas
 
-- [ ] Testes automatizados (JUnit, Mockito) para serviços e controladores
-- [ ] Migração de esquema com Flyway
-- [ ] Notificações por email (confirmação de marcações)
-- [ ] Módulo de faturação completo com emissão de PDF
-- [ ] Suporte multi-oficina
-- [ ] Aplicação móvel nativa (React Native ou Flutter)
-- [ ] Dashboard com gráficos interativos (Chart.js ou D3.js)
-- [ ] Integração com sistemas de diagnóstico OBD-II
-- [ ] Relatórios exportáveis em PDF/Excel
-- [ ] Modo offline com sincronização (PWA)
-
+| Problema | Solução |
+|----------|---------|
+| `ClassNotFoundException: com.mysql.cj.jdbc.Driver` | Confirma que o MySQL Connector está no WAR (`mvn clean package`) |
+| `Communications link failure` | Confirma que o MySQL está a correr e `DB_URL` está correto |
+| `HTTP 401 Authentication required` | Token JWT inválido ou expirado — faz login novamente |
+| `HTTP 403 Access denied` | O teu role não tem permissão para este endpoint |
+| Tomcat não inicia o contexto | Vê os logs em `TOMCAT_HOME/logs/catalina.out` |
+| `java.lang.NoSuchMethodError` | Confirma que estás a usar **Tomcat 10.1** (não 9.x) |
