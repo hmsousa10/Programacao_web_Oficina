@@ -6,88 +6,68 @@
   <title>SGO – Painel Mecânico</title>
   <link rel="stylesheet" href="css/styles.css">
 </head>
-<body class="app-layout">
+<body class="tablet-layout">
 
-  <div id="sidebar-overlay" class="sidebar-overlay"></div>
-
-  <!-- ── Sidebar ── -->
-  <nav class="sidebar">
-    <div class="sidebar-header">
-      <div class="sidebar-logo">
-        <div class="logo-icon">🔧</div>
-        <div class="logo-text">SGO<div class="logo-subtitle">Gestão de Oficina</div></div>
+  <!-- ── Tablet Header ── -->
+  <header class="tablet-header">
+    <div class="tablet-header-brand">
+      <div class="tablet-logo-icon">🔧</div>
+      <div>
+        <span class="tablet-logo-name">SGO</span>
+        <span class="tablet-logo-subtitle">Gestão de Oficina</span>
       </div>
     </div>
-    <ul class="sidebar-nav">
-      <li class="nav-section-label">Mecânico</li>
-      <li><a href="mecanico.html"><span class="nav-icon">👨‍🔧</span> Painel Mecânico</a></li>
-      <li><a href="reparacoes.html"><span class="nav-icon">🔩</span> Reparações</a></li>
-      <li><a href="viaturas.html"><span class="nav-icon">🚗</span> Viaturas</a></li>
-      <li><a href="pecas.html"><span class="nav-icon">📦</span> Peças</a></li>
-      <li><a href="logs.html"><span class="nav-icon">📋</span> Logs</a></li>
-    </ul>
-    <div class="theme-toggle">
-      <span class="theme-toggle-icon">☀️</span>
-      <label class="theme-switch" title="Alternar tema claro/escuro">
-        <input type="checkbox" class="theme-checkbox" aria-label="Alternar tema">
-        <span class="theme-slider"></span>
-      </label>
-      <span class="theme-toggle-icon">🌙</span>
-    </div>
-    <div class="sidebar-footer">
-      <div class="sidebar-user">
+
+    <h1 class="tablet-page-title">👨‍🔧 Painel Mecânico</h1>
+
+    <div class="tablet-header-actions">
+      <div class="tablet-user-info">
         <div class="sidebar-avatar" id="sidebar-avatar">?</div>
         <div class="sidebar-user-info">
           <span class="user-name" id="sidebar-name">Mecânico</span>
           <span class="user-role" id="sidebar-role">—</span>
         </div>
       </div>
-      <button class="btn btn-outline-danger btn-sm w-full" onclick="logout()">🚪 Sair</button>
+      <div class="theme-toggle">
+        <span class="theme-toggle-icon">☀️</span>
+        <label class="theme-switch" title="Alternar tema claro/escuro">
+          <input type="checkbox" class="theme-checkbox" aria-label="Alternar tema">
+          <span class="theme-slider"></span>
+        </label>
+        <span class="theme-toggle-icon">🌙</span>
+      </div>
+      <button class="btn btn-secondary" onclick="loadMyRepairs()">🔄 Atualizar</button>
+      <button class="btn btn-outline-danger" onclick="logout()">🚪 Sair</button>
     </div>
-  </nav>
+  </header>
 
   <!-- ── Main ── -->
-  <div class="main-content">
-    <header class="page-header">
-      <div class="page-header-left">
-        <button id="mobile-menu-btn" class="mobile-menu-btn">☰</button>
-        <div>
-          <h1 class="page-title">👨‍🔧 Painel Mecânico</h1>
-          <p class="page-subtitle">As minhas reparações atribuídas</p>
+  <main class="tablet-body">
+    <div class="mecanico-layout">
+
+      <!-- Left: Repair List -->
+      <aside class="card tablet-repair-list">
+        <div class="card-header">
+          <h2 class="card-title">📋 Reparações</h2>
+          <span class="badge badge-primary" id="repair-count">0</span>
         </div>
-      </div>
-      <div class="page-header-actions">
-        <button class="btn btn-secondary btn-sm" onclick="loadMyRepairs()">🔄 Atualizar</button>
-      </div>
-    </header>
-
-    <main class="page-body">
-      <div class="mecanico-layout">
-
-        <!-- Left: Repair List -->
-        <aside class="card" style="overflow:hidden; height:fit-content; max-height:calc(100vh - 120px);">
-          <div class="card-header">
-            <h2 class="card-title">📋 Reparações</h2>
-            <span class="badge badge-primary" id="repair-count">0</span>
-          </div>
-          <div class="card-body" style="padding:.75rem; overflow-y:auto; max-height:600px;">
-            <div id="repair-list">
-              <div class="loading-overlay"><div class="spinner"></div></div>
-            </div>
-          </div>
-        </aside>
-
-        <!-- Right: Detail Panel -->
-        <div id="detail-panel" class="detail-panel">
-          <div class="detail-empty">
-            <div class="detail-empty-icon">🔧</div>
-            <div class="detail-empty-text">Selecione uma reparação para ver os detalhes</div>
+        <div class="card-body tablet-repair-list-body">
+          <div id="repair-list">
+            <div class="loading-overlay"><div class="spinner"></div></div>
           </div>
         </div>
+      </aside>
 
+      <!-- Right: Detail Panel -->
+      <div id="detail-panel" class="detail-panel">
+        <div class="detail-empty">
+          <div class="detail-empty-icon">🔧</div>
+          <div class="detail-empty-text">Selecione uma reparação para ver os detalhes</div>
+        </div>
       </div>
-    </main>
-  </div>
+
+    </div>
+  </main>
 
   <!-- ── Modal: Nova Operação ── -->
   <div id="modal-op" class="modal-overlay" role="dialog" aria-modal="true">
