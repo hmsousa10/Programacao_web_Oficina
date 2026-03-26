@@ -956,12 +956,152 @@ textarea { resize: vertical; min-height: 80px; }
   max-width: 100%;
 }
 
+/* ── Tablet Layout (Mechanic full-screen) ── */
+.tablet-layout {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.tablet-header {
+  background: var(--sidebar-bg);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  padding: 0 1.5rem;
+  height: 64px;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(0,0,0,.25);
+  z-index: 50;
+}
+
+.tablet-header-brand {
+  display: flex;
+  align-items: center;
+  gap: .65rem;
+  flex-shrink: 0;
+}
+
+.tablet-logo-icon {
+  width: 40px;
+  height: 40px;
+  background: var(--primary);
+  border-radius: var(--radius);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+
+.tablet-logo-name {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #fff;
+  display: block;
+  line-height: 1.1;
+}
+
+.tablet-logo-subtitle {
+  font-size: .75rem;
+  font-weight: 400;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+}
+
+.tablet-page-title {
+  flex: 1;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #fff;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tablet-header-actions {
+  display: flex;
+  align-items: center;
+  gap: .85rem;
+  flex-shrink: 0;
+}
+
+.tablet-user-info {
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+}
+
+.tablet-user-info .user-name {
+  font-size: .85rem;
+  font-weight: 600;
+  color: #e2e8f0;
+  display: block;
+  white-space: nowrap;
+}
+
+.tablet-user-info .user-role {
+  font-size: .7rem;
+  color: #94a3b8;
+  display: block;
+}
+
+.tablet-body {
+  flex: 1;
+  overflow: hidden;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.tablet-repair-list {
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.tablet-repair-list-body {
+  padding: .75rem;
+  overflow-y: auto;
+  flex: 1;
+}
+
+/* Touch-friendly hit targets in tablet layout */
+.tablet-layout .btn {
+  min-height: 44px;
+}
+
+.tablet-layout .btn.btn-sm {
+  min-height: 36px;
+}
+
+.tablet-layout .repair-item {
+  padding: 1rem 1.1rem;
+}
+
+.tablet-layout .checklist-item {
+  padding: .85rem 1rem;
+}
+
+.tablet-layout .checklist-item input[type="checkbox"] {
+  width: 22px;
+  height: 22px;
+}
+
 /* ── Mechanic Panel ── */
 .mecanico-layout {
   display: grid;
   grid-template-columns: 320px 1fr;
   gap: 1.5rem;
   height: calc(100vh - var(--header-height) - 4rem);
+}
+
+.tablet-body .mecanico-layout {
+  height: 100%;
 }
 
 .repair-list {
@@ -1310,6 +1450,8 @@ hr {
 @media (max-width: 1024px) {
   .mecanico-layout { grid-template-columns: 280px 1fr; }
   .kpi-grid        { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
+  .tablet-header { gap: .75rem; padding: 0 1rem; }
+  .tablet-page-title { font-size: 1rem; }
 }
 
 @media (max-width: 768px) {
@@ -1333,6 +1475,21 @@ hr {
   .form-row, .form-row-3 { grid-template-columns: 1fr; }
 
   .mecanico-layout { grid-template-columns: 1fr; height: auto; }
+
+  .tablet-body .mecanico-layout { height: auto; }
+
+  .tablet-header {
+    height: auto;
+    flex-wrap: wrap;
+    padding: .75rem 1rem;
+    gap: .6rem;
+  }
+
+  .tablet-page-title { font-size: .95rem; order: 2; flex-basis: 100%; }
+
+  .tablet-header-actions { gap: .5rem; }
+
+  .tablet-user-info .user-role { display: none; }
 
   .two-col-layout  { grid-template-columns: 1fr; }
 
