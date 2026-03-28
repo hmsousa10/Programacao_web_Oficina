@@ -22,7 +22,7 @@ public class JwtFilter implements Filter {
         HttpServletResponse resp = (HttpServletResponse) response;
 
         String path = req.getServletPath();
-        if (path.startsWith("/api/auth/")) {
+        if (path.startsWith("/api/auth")) {
             chain.doFilter(request, response);
             return;
         }
