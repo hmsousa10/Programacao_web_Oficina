@@ -1,0 +1,6 @@
+#Sat Mar 28 20:04:31 WET 2026
+__DEFAULT__=false
+expression=backend/src/main/java/com/oficina/sgo/service/ClienteService.java
+org.eclipse.help.ui.localSearch.master=true
+org.eclipse.sdk.Eclipse.master=true
+org.eclipse.sdk.Google.master=true

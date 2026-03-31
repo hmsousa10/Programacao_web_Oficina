@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SGO – Painel Mecânico</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="app-layout tablet-mode"> 
+  <div id="sidebar-overlay" class="sidebar-overlay"></div>
+
+  <nav class="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo">
+        <div class="logo-icon">🔧</div>
+        <div class="logo-text">SGO<div class="logo-subtitle">Gestão de Oficina</div></div>
+      </div>
+    </div>
+    <ul class="sidebar-nav">
+      <li class="nav-section-label">Mecânico</li>
+      <li><a href="mecanico.html" class="active"><span class="nav-icon">👨‍🔧</span> Painel Mecânico</a></li>
+      <li><a href="reparacoes.html"><span class="nav-icon">🔩</span> Reparações</a></li>
+      <li><a href="viaturas.html"><span class="nav-icon">🚗</span> Viaturas</a></li>
+      <li><a href="pecas.html"><span class="nav-icon">📦</span> Peças</a></li>
+      <li><a href="logs.html"><span class="nav-icon">📋</span> Logs</a></li>
+    </ul>
+    <div class="sidebar-footer">
+      <button class="btn btn-outline-danger btn-sm w-full" onclick="logout()">🚪 Sair</button>
+    </div>
+  </nav>
+
+  <div class="main-content">
+    <header class="page-header" style="position: relative;">
+      <div class="page-header-left">
+        <h1 class="page-title">👨‍🔧 Painel Mecânico</h1>
+      </div>
+      
+      <div class="page-header-center header-user-name">
+        <span id="top-user-name">Bem-vindo, Mecânico</span>
+      </div>
+
+      <div class="page-header-actions" id="header-actions">
+        <div class="theme-toggle" style="margin: 0; padding: 0;">
+          <span class="theme-toggle-icon">☀️</span>
+          <label class="theme-switch" title="Alternar tema">
+            <input type="checkbox" class="theme-checkbox" aria-label="Alternar tema" checked>
+            <span class="theme-slider"></span>
+          </label>
+          <span class="theme-toggle-icon">🌙</span>
+        </div>
+        <button class="btn btn-secondary" onclick="loadMyRepairs()">🔄 Atualizar</button>
+      </div>
+    </header>
+
+    <main class="page-body">
+      
+      <div id="view-dashboard" class="view-section active">
+        <div class="dashboard-kpi-row">
+          <div class="kpi-card">
+            <div class="kpi-icon" style="background: rgba(234, 179, 8, 0.1); color: #eab308;">⏳</div>
+            <div class="kpi-info">
+              <span class="kpi-label">Pendentes</span>
+              <h3 class="kpi-value" id="kpi-pendentes">0</h3>
+            </div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-icon" style="background: rgba(59, 130, 246, 0.1); color: #3b82f6;">🔧</div>
+            <div class="kpi-info">
+              <span class="kpi-label">Em Progresso</span>
+              <h3 class="kpi-value" id="kpi-progresso">0</h3>
+            </div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-icon" style="background: rgba(168, 85, 247, 0.1); color: #a855f7;">📦</div>
+            <div class="kpi-info">
+              <span class="kpi-label">Aguarda Peças</span>
+              <h3 class="kpi-value" id="kpi-pecas">0</h3>
+            </div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-icon" style="background: rgba(34, 197, 94, 0.1); color: #22c55e;">✅</div>
+            <div class="kpi-info">
+              <span class="kpi-label">Concluídos</span>
+              <h3 class="kpi-value" id="kpi-concluidos">0</h3>
+            </div>
+          </div>
+        </div>
+
+        <div class="card table-card mt-2">
+          <div class="card-header">
+            <h2 class="card-title">📋 Fila de Trabalho</h2>
+          </div>
+          <div class="card-body p-0">
+            <div class="table-wrapper">
+              <table class="modern-table">
+                <thead>
+                  <tr>
+                    <th>Matrícula</th>
+                    <th>Veículo</th>
+                    <th>Cliente</th>
+                    <th>Data</th>
+                    <th>Estado</th>
+                    <th>Ações</th>
+                  </tr>
+                </thead>
+                <tbody id="repair-list">
+                  <tr><td colspan="6"><div class="loading-overlay"><div class="spinner"></div></div></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="view-details" class="view-section hidden">
+        <div class="details-nav mb-2">
+          <button class="btn btn-secondary" onclick="backToDashboard()">⬅ Voltar ao Dashboard</button>
+        </div>
+        
+        <div id="details-content-wrapper"></div>
+      </div>
+
+    </main>
+  </div>
+
+  <div id="modal-trabalhos" class="modal-overlay" role="dialog" aria-modal="true">
+    <div class="modal modal-lg">
+      <div class="modal-header">
+        <h3 class="modal-title">📋 Checklist & Diagnóstico</h3>
+        <button class="modal-close" onclick="hideModal('modal-trabalhos')">✕</button>
+      </div>
+      <div class="modal-body" style="background: var(--bg);">
+        
+        <div class="card p-0 mb-2">
+          <div class="card-header" style="display: flex; justify-content: space-between;">
+            <h3 class="card-title">🔩 Operações / Problemas Encontrados</h3>
+            <button class="btn btn-primary btn-sm" onclick="openOpModal()">+ Adicionar Operação</button>
+          </div>
+          <div class="card-body">
+            <div id="op-list"></div>
+          </div>
+        </div>
+
+        <div class="card p-0">
+          <div class="card-header" style="display: flex; justify-content: space-between;">
+            <h3 class="card-title">✅ Checklist de Verificação</h3>
+            <button class="btn btn-secondary btn-sm" onclick="clearChecklist()">Limpar</button>
+          </div>
+          <div class="card-body">
+            <div class="checklist" id="checklist" style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;"></div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer" style="background: var(--card-bg);">
+        <button type="button" class="btn btn-secondary" onclick="hideModal('modal-trabalhos')">Sair</button>
+        <button type="button" class="btn btn-success" onclick="concluirDiagnostico()">✅ Concluir Diagnóstico</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="modal-gestao-pecas" class="modal-overlay" role="dialog" aria-modal="true">
+    <div class="modal modal-lg">
+      <div class="modal-header">
+        <h3 class="modal-title">📦 Requisitar Peças</h3>
+        <button class="modal-close" onclick="hideModal('modal-gestao-pecas')">✕</button>
+      </div>
+      <div class="modal-body">
+        <input type="text" class="form-control" id="peca-search" placeholder="Pesquisar peça pela referência ou nome…" oninput="filterPecas(this.value)" style="margin-bottom:1rem; width: 100%;">
+        <div class="table-wrapper" style="max-height:400px; overflow-y:auto;">
+          <table class="modern-table">
+            <thead><tr><th>Ref</th><th>Peça</th><th>Stock</th><th>Ação</th></tr></thead>
+            <tbody id="pecas-tbody"><tr><td colspan="4" class="text-center">A carregar…</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="modal-op" class="modal-overlay" style="z-index: 1010;" role="dialog">
+    <div class="modal modal-sm">
+      <div class="modal-header"><h3 class="modal-title" id="modal-op-title">Nova Operação</h3><button class="modal-close" onclick="hideModal('modal-op')">✕</button></div>
+      <form id="form-op" onsubmit="submitOperacao(event)">
+        <div class="modal-body">
+          <input type="hidden" id="op-id">
+          <div class="form-group"><label>Descrição *</label><input type="text" id="op-descricao" required></div>
+          <div class="form-row">
+            <div class="form-group"><label>Tempo Estimado (min)</label><input type="number" id="op-tempo" min="1"></div>
+            <div class="form-group"><label>Valor (€)</label><input type="number" id="op-valor" min="0" step="0.01"></div>
+          </div>
+          <div class="form-group">
+            <label>Estado da Operação</label>
+            <select id="op-estado"><option value="NAO_INICIADA">Não Iniciada</option><option value="EM_CURSO">Em Curso</option><option value="CONCLUIDA">Concluída</option></select>
+          </div>
+        </div>
+        <div class="modal-footer"><button type="button" class="btn btn-secondary" onclick="hideModal('modal-op')">Cancelar</button><button type="submit" class="btn btn-primary">Guardar</button></div>
+      </form>
+    </div>
+  </div>
+
+  <div id="modal-requisitar" class="modal-overlay" style="z-index: 1010;" role="dialog">
+    <div class="modal modal-sm">
+      <div class="modal-header"><h3 class="modal-title">Confirmar Requisição</h3><button class="modal-close" onclick="hideModal('modal-requisitar')">✕</button></div>
+      <form id="form-requisitar" onsubmit="submitRequisicao(event)">
+        <div class="modal-body">
+          <input type="hidden" id="req-peca-id">
+          <p id="req-peca-desc" style="font-weight:600; margin-bottom:.5rem">—</p>
+          <div class="form-group"><label>Quantidade *</label><input type="number" id="req-qty" required min="1" value="1"></div>
+          <div class="form-group"><label>Observações</label><input type="text" id="req-obs" placeholder="Para esta reparação…"></div>
+        </div>
+        <div class="modal-footer"><button type="button" class="btn btn-secondary" onclick="hideModal('modal-requisitar')">Cancelar</button><button type="submit" class="btn btn-primary">Confirmar</button></div>
+      </form>
+    </div>
+  </div>
+
+  <script src="js/utils.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/mecanico.js"></script>
+</body>
+</html>

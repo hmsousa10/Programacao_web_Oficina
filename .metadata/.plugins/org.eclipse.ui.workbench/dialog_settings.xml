@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<section name="Workbench">
+	<section name="ImportExportAction">
+		<item key="ImportExportPage.STORE_SELECTED_IMPORT_WIZARD_ID" value="org.eclipse.m2e.core.wizards.Maven2ImportWizard"/>
+		<list key="ImportExportPage.STORE_EXPANDED_IMPORT_CATEGORIES">
+			<item value="org.eclipse.m2e"/>
+		</list>
+		<section name="ImportExportWizard.dialogBounds">
+			<item key="DIALOG_X_ORIGIN" value="0"/>
+			<item key="DIALOG_Y_ORIGIN" value="0"/>
+			<item key="DIALOG_WIDTH" value="1936"/>
+			<item key="DIALOG_HEIGHT" value="1048"/>
+			<item key="DIALOG_FONT_NAME" value="1|Segoe UI|9.0|0|WINDOWS|1|-12|0|0|0|400|0|0|0|1|0|0|0|0|Segoe UI"/>
+		</section>
+	</section>
+	<section name="org.eclipse.ui.internal.QuickAccess">
+		<item key="org.eclipse.ui.internal.quickaccess.QuickAccessDialogDIALOG_WIDTH" value="450"/>
+		<item key="org.eclipse.ui.internal.quickaccess.QuickAccessDialogDIALOG_HEIGHT" value="506"/>
+		<item key="org.eclipse.ui.internal.quickaccess.QuickAccessDialogDIALOG_USE_PERSISTED_SIZE" value="true"/>
+		<item key="org.eclipse.ui.internal.quickaccess.QuickAccessDialogDIALOG_USE_PERSISTED_LOCATION" value="false"/>
+		<list key="orderedElements">
+			<item value="/backend/src/main/java/com/oficina/sgo/service/ReparacaoService.java"/>
+			<item value="/backend/src/main/java/com/oficina/sgo/model/Reparacao.java"/>
+			<item value="/backend/src/main/java/com/oficina/sgo/service/PecaService.java"/>
+			<item value="/backend/src/main/java/com/oficina/sgo/model/Peca.java"/>
+			<item value="/backend/src/main/webapp/js/pecas.js"/>
+			<item value="/backend/src/main/java/com/oficina/sgo/dto/request/StockMovimentoRequest.java"/>
+			<item value="/backend/src/main/webapp/js/agenda.js"/>
+			<item value="/backend/src/main/java/com/oficina/sgo/dto/response/ReparacaoResponse.java"/>
+			<item value="/backend/src/main/webapp/css/styles.css"/>
+			<item value="/backend/src/main/webapp/js/mecanico.js"/>
+			<item value="/backend/src/main/java/com/oficina/sgo/service/AuthService.java"/>
+			<item value="/backend/src/main/java/com/oficina/sgo/dto/response/UserResponse.java"/>
+			<item value="/backend/src/main/webapp/js/auth.js"/>
+			<item value="/backend/src/main/webapp/mecanico.html"/>
+			<item value="/backend/src/main/webapp/js/viaturas.js"/>
+			<item value="/backend/src/main/webapp/js/reparacoes.js"/>
+			<item value="/backend/src/main/java/com/oficina/sgo/dto/request/CreateReparacaoRequest.java"/>
+			<item value="/backend/src/main/java/com/oficina/sgo/dto/request/CreateViaturaRequest.java"/>
+			<item value="/backend/src/main/java/com/oficina/sgo/servlet/BaseApiServlet.java"/>
+			<item value="org.eclipse.ui.console.ConsoleView"/>
+			<item value="/backend/src/main/java/com/oficina/sgo/service/ClienteService.java"/>
+			<item value="/backend/src/main/java/com/oficina/sgo/service/ViaturaService.java"/>
+			<item value="/backend/src/main/java/com/oficina/sgo/dto/response/ViaturaResponse.java"/>
+			<item value="/backend/src/main/java/com/oficina/sgo/model/Viatura.java"/>
+			<item value="/backend/src/main/java/com/oficina/sgo/filter/JwtFilter.java"/>
+			<item value="/backend/src/main/java/com/oficina/sgo/listener/AppContextListener.java"/>
+			<item value="/Servers/Tomcat v11.0 Server at localhost-config/web.xml"/>
+		</list>
+		<list key="orderedProviders">
+			<item value="org.eclipse.ui.ide/org.eclipse.ui.internal.ide.dialogs.OpenResourceQuickAccessComputer"/>
+			<item value="org.eclipse.ui.ide/org.eclipse.ui.internal.ide.dialogs.OpenResourceQuickAccessComputer"/>
+			<item value="org.eclipse.ui.ide/org.eclipse.ui.internal.ide.dialogs.OpenResourceQuickAccessComputer"/>
+			<item value="org.eclipse.ui.ide/org.eclipse.ui.internal.ide.dialogs.OpenResourceQuickAccessComputer"/>
+			<item value="org.eclipse.ui.ide/org.eclipse.ui.internal.ide.dialogs.OpenResourceQuickAccessComputer"/>
+			<item value="org.eclipse.ui.ide/org.eclipse.ui.internal.ide.dialogs.OpenResourceQuickAccessComputer"/>
+			<item value="org.eclipse.ui.ide/org.eclipse.ui.internal.ide.dialogs.OpenResourceQuickAccessComputer"/>
+			<item value="org.eclipse.ui.ide/org.eclipse.ui.internal.ide.dialogs.OpenResourceQuickAccessComputer"/>
+			<item value="org.eclipse.ui.ide/org.eclipse.ui.internal.ide.dialogs.OpenResourceQuickAccessComputer"/>
+			<item value="org.eclipse.ui.ide/org.eclipse.ui.internal.ide.dialogs.OpenResourceQuickAccessComputer"/>
+			<item value="org.eclipse.ui.ide/org.eclipse.ui.internal.ide.dialogs.OpenResourceQuickAccessComputer"/>
+			<item value="org.eclipse.ui.ide/org.eclipse.ui.internal.ide.dialogs.OpenResourceQuickAccessComputer"/>
+			<item value="org.eclipse.ui.ide/org.eclipse.ui.internal.ide.dialogs.OpenResourceQuickAccessComputer"/>
+			<item value="org.eclipse.ui.ide/org.eclipse.ui.internal.ide.dialogs.OpenResourceQuickAccessComputer"/>
+			<item value="org.eclipse.ui.ide/org.eclipse.ui.internal.ide.dialogs.OpenResourceQuickAccessComputer"/>
+			<item value="org.eclipse.ui.ide/org.eclipse.ui.internal.ide.dialogs.OpenResourceQuickAccessComputer"/>
+			<item value="org.eclipse.ui.ide/org.eclipse.ui.internal.ide.dialogs.OpenResourceQuickAccessComputer"/>
+			<item value="org.eclipse.ui.ide/org.eclipse.ui.internal.ide.dialogs.OpenResourceQuickAccessComputer"/>
+			<item value="org.eclipse.ui.ide/org.eclipse.ui.internal.ide.dialogs.OpenResourceQuickAccessComputer"/>
+			<item value="org.eclipse.e4.ui.parts"/>
+			<item value="org.eclipse.ui.ide/org.eclipse.ui.internal.ide.dialogs.OpenResourceQuickAccessComputer"/>
+			<item value="org.eclipse.ui.ide/org.eclipse.ui.internal.ide.dialogs.OpenResourceQuickAccessComputer"/>
+			<item value="org.eclipse.ui.ide/org.eclipse.ui.internal.ide.dialogs.OpenResourceQuickAccessComputer"/>
+			<item value="org.eclipse.ui.ide/org.eclipse.ui.internal.ide.dialogs.OpenResourceQuickAccessComputer"/>
+			<item value="org.eclipse.ui.ide/org.eclipse.ui.internal.ide.dialogs.OpenResourceQuickAccessComputer"/>
+			<item value="org.eclipse.ui.ide/org.eclipse.ui.internal.ide.dialogs.OpenResourceQuickAccessComputer"/>
+			<item value="org.eclipse.ui.ide/org.eclipse.ui.internal.ide.dialogs.OpenResourceQuickAccessComputer"/>
+		</list>
+		<list key="textEntries">
+			<item value="1"/>
+			<item value="1"/>
+			<item value="1"/>
+			<item value="1"/>
+			<item value="1"/>
+			<item value="1"/>
+			<item value="1"/>
+			<item value="1"/>
+			<item value="1"/>
+			<item value="1"/>
+			<item value="1"/>
+			<item value="1"/>
+			<item value="1"/>
+			<item value="1"/>
+			<item value="1"/>
+			<item value="1"/>
+			<item value="1"/>
+			<item value="2"/>
+			<item value="1"/>
+			<item value="1"/>
+			<item value="1"/>
+			<item value="1"/>
+			<item value="1"/>
+			<item value="1"/>
+			<item value="1"/>
+			<item value="1"/>
+			<item value="1"/>
+		</list>
+		<list key="textArray">
+			<item value="reparacaoservice.java"/>
+			<item value="reparacao.java"/>
+			<item value="pecaservice.java"/>
+			<item value="peca.java"/>
+			<item value="pecas.js"/>
+			<item value="stockmovimentorequest.java"/>
+			<item value="agenda.js"/>
+			<item value="reparacaoresponse.java"/>
+			<item value="styles.css"/>
+			<item value="mecanico.js"/>
+			<item value="authservice.java"/>
+			<item value="userresponse.java"/>
+			<item value="auth.js"/>
+			<item value="mecanico.html"/>
+			<item value="viaturas.js"/>
+			<item value="reparacoes.js"/>
+			<item value="createreparacaorequest.java"/>
+			<item value="createviaturarequest.java"/>
+			<item value="reateviaturarequest.java"/>
+			<item value="baseapiservlet.java"/>
+			<item value="console"/>
+			<item value="clienteservice.java"/>
+			<item value="viaturaservice.java"/>
+			<item value="viaturaresponse.java"/>
+			<item value="viatura.java"/>
+			<item value="jwtfilter.java"/>
+			<item value="appcontextlistener.java"/>
+			<item value="web.xml"/>
+		</list>
+	</section>
+	<section name="NewWizardAction">
+		<section name="NewWizard.dialogBounds">
+			<item key="DIALOG_X_ORIGIN" value="706"/>
+			<item key="DIALOG_Y_ORIGIN" value="222"/>
+			<item key="DIALOG_WIDTH" value="525"/>
+			<item key="DIALOG_HEIGHT" value="500"/>
+			<item key="DIALOG_FONT_NAME" value="1|Segoe UI|9.0|0|WINDOWS|1|-12|0|0|0|400|0|0|0|1|0|0|0|0|Segoe UI"/>
+		</section>
+	</section>
+</section>

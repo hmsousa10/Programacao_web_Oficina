@@ -1,0 +1,6 @@
+#Sat Mar 28 20:34:39 WET 2026
+__DEFAULT__=false
+expression=styles.css
+org.eclipse.help.ui.localSearch.master=true
+org.eclipse.sdk.Eclipse.master=true
+org.eclipse.sdk.Google.master=true

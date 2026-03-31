@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SGO – Painel Mecânico</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="tablet-layout">
+
+  <header class="tablet-header">
+    <div class="tablet-header-brand">
+      <div class="tablet-logo-icon">🔧</div>
+      <div>
+        <span class="tablet-logo-name">SGO</span>
+        <span class="tablet-logo-subtitle">Gestão de Oficina</span>
+      </div>
+    </div>
+
+    <h1 class="tablet-page-title">👨‍🔧 Painel Mecânico</h1>
+
+    <div class="tablet-header-actions">
+      <div class="tablet-user-info">
+        <div class="sidebar-avatar" id="sidebar-avatar">?</div>
+        <div class="sidebar-user-info">
+          <span class="user-name" id="sidebar-name">Mecânico</span>
+          <span class="user-role" id="sidebar-role">—</span>
+        </div>
+      </div>
+      <div class="theme-toggle">
+        <span class="theme-toggle-icon">☀️</span>
+        <label class="theme-switch" title="Alternar tema claro/escuro">
+          <input type="checkbox" class="theme-checkbox" aria-label="Alternar tema">
+          <span class="theme-slider"></span>
+        </label>
+        <span class="theme-toggle-icon">🌙</span>
+      </div>
+      <a href="index.html" class="btn btn-secondary">⬅ Voltar</a>
+      <button class="btn btn-secondary" onclick="loadMyRepairs()">🔄 Atualizar</button>
+      <button class="btn btn-outline-danger" onclick="logout()">🚪 Sair</button>
+    </div>
+  </header>
+
+  <main class="tablet-body">
+    <div class="mecanico-layout">
+
+      <aside class="card tablet-repair-list">
+        <div class="card-header">
+          <h2 class="card-title">📋 Fila de Trabalho</h2>
+          <span class="badge badge-primary" id="repair-count">0</span>
+        </div>
+        <div class="card-body tablet-repair-list-body">
+          <div id="repair-list">
+            <div class="loading-overlay"><div class="spinner"></div></div>
+          </div>
+        </div>
+      </aside>
+
+      <div id="detail-panel" class="detail-panel">
+        <div class="detail-empty">
+          <div class="detail-empty-icon">🔧</div>
+          <div class="detail-empty-text">Selecione uma reparação na fila para ver os detalhes e iniciar o trabalho</div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <div id="modal-op" class="modal-overlay" role="dialog" aria-modal="true">
+    <div class="modal modal-sm">
+      <div class="modal-header">
+        <h3 class="modal-title" id="modal-op-title">Nova Operação</h3>
+        <button class="modal-close" onclick="hideModal('modal-op')">✕</button>
+      </div>
+      <form id="form-op" onsubmit="submitOperacao(event)">
+        <div class="modal-body">
+          <input type="hidden" id="op-id">
+          <div class="form-group">
+            <label for="op-descricao">Descrição *</label>
+            <input type="text" id="op-descricao" required placeholder="Substituição de pastilhas…">
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="op-tempo">Tempo Estimado (min)</label>
+              <input type="number" id="op-tempo" min="1" max="999" placeholder="60">
+            </div>
+            </div>
+          <div class="form-group">
+            <label for="op-estado">Estado</label>
+            <select id="op-estado">
+              <option value="PENDENTE">Pendente</option>
+              <option value="EM_EXECUCAO">Em Execução</option>
+              <option value="CONCLUIDA">Concluída</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="hideModal('modal-op')">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Guardar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="modal-requisitar" class="modal-overlay" role="dialog" aria-modal="true">
+    <div class="modal modal-sm">
+      <div class="modal-header">
+        <h3 class="modal-title" id="modal-req-title">Requisitar Peça</h3>
+        <button class="modal-close" onclick="hideModal('modal-requisitar')">✕</button>
+      </div>
+      <form id="form-requisitar" onsubmit="submitRequisicao(event)">
+        <div class="modal-body">
+          <input type="hidden" id="req-peca-id">
+          <p id="req-peca-desc" style="font-weight:600; margin-bottom:.5rem">—</p>
+          <div class="form-group">
+            <label for="req-qty">Quantidade *</label>
+            <input type="number" id="req-qty" required min="1" value="1">
+          </div>
+          <div class="form-group">
+            <label for="req-obs">Observações</label>
+            <input type="text" id="req-obs" placeholder="Para reparação…">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="hideModal('modal-requisitar')">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Requisitar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="js/utils.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/mecanico.js"></script>
+</body>
+</html>

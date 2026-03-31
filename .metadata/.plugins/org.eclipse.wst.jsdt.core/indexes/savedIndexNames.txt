@@ -1,0 +1,7 @@
+INDEX VERSION 1.4+C:\Users\hugom\OneDrive\Ambiente de Trabalho\Programacao_web_Oficina-main\.metadata\.plugins\org.eclipse.wst.jsdt.core\indexes
+2817175591.index
+2898199000.index
+1681262783.index
+460572466.index
+1965174767.index
+1365496347.index

@@ -1,0 +1,555 @@
+/* ========================================================
+   SGO - mecanico.js  |  Mechanic Work Panel
+   ======================================================== */
+
+'use strict';
+
+const CHECKLIST_ITEMS = [
+  'Verificação de óleo',
+  'Verificação de travões',
+  'Verificação de suspensão',
+  'Verificação de pneus',
+  'Diagnóstico eletrónico',
+  'Verificação de luzes',
+  'Verificação de fluidos',
+  'Verificação de bateria',
+];
+
+let allRepairs      = [];
+let currentRepair   = null;
+let allPecas        = [];
+let timerInterval   = null;
+let timerSeconds    = 0;
+let timerRunning    = false;
+let currentOpId     = null; 
+
+document.addEventListener('DOMContentLoaded', async () => {
+  if (!initProtectedPage(['MECHANIC', 'MANAGER'])) return;
+  await loadMyRepairs();
+});
+
+/* ── Botões de Navegação e Views ── */
+function voltarGlobal() {
+  const viewDetails = document.getElementById('view-details');
+  if (viewDetails && viewDetails.classList.contains('active')) {
+    backToDashboard(); // Se estiver na reparação, volta para a tabela
+  } else {
+    window.location.href = 'index.html'; // Senão, volta para o painel inicial do sistema
+  }
+}
+
+function backToDashboard() {
+  document.getElementById('view-details').classList.remove('active');
+  document.getElementById('view-details').classList.add('hidden');
+  document.getElementById('view-dashboard').classList.remove('hidden');
+  document.getElementById('view-dashboard').classList.add('active');
+  
+  if (timerRunning) stopTimer(false);
+  currentRepair = null;
+  loadMyRepairs(); 
+}
+
+/* ── Carregar Dados ── */
+async function loadMyRepairs() {
+  const user = getCurrentUser();
+  if (!user) return;
+  const listEl = document.getElementById('repair-list');
+  if (!listEl) return;
+
+  listEl.innerHTML = `<tr><td colspan="6"><div class="loading-overlay"><div class="spinner"></div></div></td></tr>`;
+
+  try {
+    const data = await api.getReparacoesMecanico(user.id) || [];
+    
+    // Atualizar KPIs (Contagem das caixas no topo)
+    const pendentes = data.filter(r => r.estado === 'PENDENTE').length;
+    const progresso = data.filter(r => r.estado === 'EM_EXECUCAO' || r.estado === 'EM_PROGRESSO').length;
+    const pecas     = data.filter(r => r.estado === 'AGUARDA_PECAS').length;
+    const concluidos = data.filter(r => r.estado === 'CONCLUIDA').length;
+
+    document.getElementById('kpi-pendentes').textContent = pendentes;
+    document.getElementById('kpi-progresso').textContent = progresso;
+    document.getElementById('kpi-pecas').textContent = pecas;
+    document.getElementById('kpi-concluidos').textContent = concluidos;
+
+    // Filtrar a tabela apenas para os não concluídos
+    allRepairs = data.filter(r => ['PENDENTE', 'EM_PROGRESSO', 'EM_EXECUCAO', 'AGUARDA_PECAS'].includes(r.estado));
+    
+    renderRepairList();
+  } catch (err) {
+    listEl.innerHTML = `<tr><td colspan="6" class="text-center text-danger">❌ Erro: ${escapeHtml(err.message)}</td></tr>`;
+  }
+}
+
+/* ── Tabela Principal ── */
+function renderRepairList() {
+  const tbody = document.getElementById('repair-list');
+  if (!tbody) return;
+  if (!allRepairs.length) {
+    tbody.innerHTML = `<tr><td colspan="6" class="text-center" style="padding: 2rem;">🎉 Não tem reparações na fila neste momento.</td></tr>`;
+    return;
+  }
+  
+  // Agora gera linhas <tr> compatíveis com a tabela do HTML
+  tbody.innerHTML = allRepairs.map(r => {
+    const matricula = r.viaturaMatricula || '#' + r.id;
+    const veiculo = `${r.viaturaMarca || ''} ${r.viaturaModelo || ''}`.trim() || '—';
+    const cliente = r.clienteNome || '—';
+
+    return `
+      <tr>
+        <td><strong>${escapeHtml(matricula)}</strong></td>
+        <td>${escapeHtml(veiculo)}</td>
+        <td>${escapeHtml(cliente)}</td>
+        <td>${formatDate(r.dataInicio)}</td>
+        <td>${getStatusBadge(r.estado)}</td>
+        <td>
+          <button class="btn btn-primary btn-sm" onclick="selectReparacao(${r.id})">
+            👀 Ver Detalhes
+          </button>
+        </td>
+      </tr>`;
+  }).join('');
+}
+
+/* ── Selecionar Reparação (Muda de Ecrã) ── */
+async function selectReparacao(id) {
+  if (timerRunning && currentRepair?.id !== id) {
+    stopTimer(false);
+  }
+
+  try {
+    const repair = await api.getReparacao(id);
+    currentRepair = repair;
+    
+    // Trocar de Tabela para Vista Detalhada
+    document.getElementById('view-dashboard').classList.remove('active');
+    document.getElementById('view-dashboard').classList.add('hidden');
+    document.getElementById('view-details').classList.remove('hidden');
+    document.getElementById('view-details').classList.add('active');
+
+    renderDetailPanel();
+    await loadPecas('');
+    window.scrollTo(0,0);
+  } catch (err) {
+    showToast('Erro ao carregar reparação: ' + err.message, 'error');
+  }
+}
+
+/* ── Vista Expandida (Detalhes) ── */
+function renderDetailPanel() {
+  const wrapper = document.getElementById('details-content-wrapper');
+  if (!wrapper || !currentRepair) return;
+
+  const r = currentRepair;
+
+  wrapper.innerHTML = `
+    <div class="two-col-layout" style="gap:1rem; margin-bottom: 1.5rem;">
+      <div class="card p-0">
+        <div class="card-header">
+          <h3 class="card-title">🚗 Viatura</h3>
+        </div>
+        <div class="card-body">
+          <div class="info-grid">
+            <div class="info-item">
+              <span class="info-label">Matrícula</span>
+              <span class="info-value" style="font-size:1.1rem; font-weight:bold;">${escapeHtml(r.viaturaMatricula || '—')}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Marca / Modelo</span>
+              <span class="info-value">${escapeHtml(r.viaturaMarca || '—')} ${escapeHtml(r.viaturaModelo || '')}</span>
+            </div>
+            <div class="info-item" style="grid-column:1/-1">
+              <span class="info-label">Descrição da Avaria Relatada:</span>
+              <span class="info-value" style="background: var(--bg); padding: 0.5rem; border-radius: var(--radius); margin-top: 0.25rem; display: block;">${escapeHtml(r.descricao || 'Nenhuma')}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="card p-0">
+        <div class="card-header">
+          <h3 class="card-title">👤 Cliente</h3>
+        </div>
+        <div class="card-body">
+          <div class="info-grid">
+            <div class="info-item">
+              <span class="info-label">Nome</span>
+              <span class="info-value">${escapeHtml(r.clienteNome || '—')}</span>
+            </div>
+            <div class="info-item" style="grid-column:1/-1">
+              <span class="info-label">Estado da Reparação</span>
+              <span class="info-value" style="margin-top: 0.25rem; display: block;">${getStatusBadge(r.estado)}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="stopwatch" style="margin-bottom: 1.5rem; max-width: 600px; margin-left: auto; margin-right: auto;">
+      <div class="stopwatch-display" id="stopwatch-display">${formatStopwatch(timerSeconds)}</div>
+      <div class="stopwatch-controls" style="justify-content: center;">
+        <button class="btn btn-success" id="btn-start" onclick="startTimer()">▶ Iniciar</button>
+        <button class="btn btn-warning" id="btn-stop" onclick="stopTimer(true)" disabled>⏸ Parar e Guardar</button>
+        <button class="btn btn-secondary" onclick="resetTimer()">↺ Limpar Cronómetro</button>
+      </div>
+      <p style="margin-top:.75rem; font-size:.8rem; color:var(--text-muted); text-align: center;">Dica: Edite uma operação abaixo para vincular o cronómetro.</p>
+    </div>
+
+    <div class="card p-0" style="margin-bottom: 1.5rem;">
+      <div class="card-header" style="display: flex; justify-content: space-between;">
+        <h3 class="card-title">🔩 Operações de Trabalho</h3>
+        <button class="btn btn-primary btn-sm" onclick="openOpModal()">+ Adicionar Operação</button>
+      </div>
+      <div class="card-body">
+        <div id="op-list">
+          ${renderOperacoes(r.operacoes || [])}
+        </div>
+      </div>
+    </div>
+
+    <div class="two-col-layout" style="gap:1rem; margin-bottom: 2rem;">
+        <div class="card p-0">
+          <div class="card-header" style="display: flex; justify-content: space-between;">
+            <h3 class="card-title">✅ Checklist Diagnóstico</h3>
+            <button class="btn btn-secondary btn-sm" onclick="clearChecklist()">Limpar</button>
+          </div>
+          <div class="card-body">
+            <div class="checklist" id="checklist" style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
+              ${renderChecklist()}
+            </div>
+          </div>
+        </div>
+
+        <div class="card p-0">
+          <div class="card-header">
+            <h3 class="card-title">📦 Requisitar Peças</h3>
+          </div>
+          <div class="card-body">
+            <input type="text" class="form-control" id="peca-search" placeholder="Pesquisar peça…" oninput="filterPecas(this.value)" style="margin-bottom:0.75rem;">
+            <div class="table-wrapper" style="max-height:200px; overflow-y:auto;">
+              <table class="modern-table">
+                <thead><tr><th>Ref</th><th>Designação</th><th>Stock</th><th></th></tr></thead>
+                <tbody id="pecas-tbody">
+                  <tr><td colspan="4" class="text-center text-muted">A carregar…</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+    </div>
+
+    <div style="display:flex; justify-content:flex-end; gap:1rem; padding-bottom: 2rem;">
+      ${r.estado !== 'CONCLUIDA' ? `
+        <button class="btn btn-warning btn-lg" onclick="updateEstado('AGUARDA_PECAS')">⏳ Aguarda Peças</button>
+        <button class="btn btn-success btn-lg" onclick="concluirReparacao()">✅ Concluir Trabalho</button>
+      ` : `<span class="badge badge-success" style="font-size:1.2rem; padding:.75rem 1.5rem;">Trabalho Concluído</span>`}
+    </div>
+  `;
+
+  if (timerRunning) {
+    document.getElementById('btn-start')?.setAttribute('disabled', true);
+    document.getElementById('btn-stop')?.removeAttribute('disabled');
+  }
+}
+
+/* ── Render operations ── */
+function renderOperacoes(operacoes) {
+  if (!operacoes.length) {
+    return `<p class="text-muted" style="text-align:center; padding:.75rem">Sem operações registadas. Adicione a primeira.</p>`;
+  }
+  return operacoes.map(op => `
+    <div class="op-item" style="margin-bottom:.75rem; padding: 1rem; border: 1px solid var(--border); border-radius: var(--radius); background: var(--bg); ${currentOpId === op.id ? 'border-left: 4px solid var(--primary-color)' : ''}">
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <div class="op-info">
+          <div class="op-desc" style="font-size: 1.05rem; font-weight: 500;">
+            ${escapeHtml(op.descricao)} 
+            ${currentOpId === op.id ? '<span class="badge badge-primary" style="margin-left: 5px;">⏱️ Cronómetro Associado</span>' : ''}
+          </div>
+          <div class="op-meta" style="margin-top: 0.25rem; font-size: 0.9rem;">
+            ${op.tempoEstimadoMinutos ? '⏱ Est: ' + formatDuration(op.tempoEstimadoMinutos) : '⏱ Est: --'}
+            | 
+            ${op.tempoRealMinutos ? '<strong>Real: ' + formatDuration(op.tempoRealMinutos) + '</strong>' : 'Real: --'}
+          </div>
+        </div>
+        <div style="display:flex; gap:0.5rem; align-items:center">
+          ${getStatusBadge(op.estado || 'PENDENTE')}
+          <button class="btn btn-secondary btn-sm" onclick="openOpModal(${op.id})" title="Editar / Associar Tempo">✏️ Editar</button>
+          ${op.estado !== 'CONCLUIDA' ? `<button class="btn btn-success btn-sm" onclick="concluirOperacao(${op.id})" title="Concluir">✅</button>` : ''}
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+/* ── Checklist ── */
+function getChecklistKey() {
+  return `sgo_checklist_${currentRepair?.id || 'generic'}`;
+}
+
+function renderChecklist() {
+  const saved = JSON.parse(localStorage.getItem(getChecklistKey()) || '{}');
+  return CHECKLIST_ITEMS.map((item, i) => {
+    const checked = saved[i] || false;
+    return `
+      <div class="checklist-item ${checked ? 'checked' : ''}" onclick="toggleChecklistItem(${i}, this)" style="padding: 0.5rem; border: 1px solid var(--border); border-radius: var(--radius); cursor: pointer;">
+        <input type="checkbox" id="chk-${i}" ${checked ? 'checked' : ''} onchange="toggleChecklistItem(${i}, this.closest('.checklist-item'))" style="margin-right: 0.5rem;">
+        <label for="chk-${i}" style="cursor: pointer;">${escapeHtml(item)}</label>
+      </div>`;
+  }).join('');
+}
+
+function toggleChecklistItem(index, itemEl) {
+  const key   = getChecklistKey();
+  const saved = JSON.parse(localStorage.getItem(key) || '{}');
+  saved[index] = !saved[index];
+  localStorage.setItem(key, JSON.stringify(saved));
+
+  if (itemEl) {
+    itemEl.classList.toggle('checked', saved[index]);
+    const chk = itemEl.querySelector('input[type="checkbox"]');
+    if (chk) chk.checked = saved[index];
+  }
+}
+
+function clearChecklist() {
+  localStorage.removeItem(getChecklistKey());
+  const cl = document.getElementById('checklist');
+  if (cl) cl.innerHTML = renderChecklist();
+}
+
+/* ── Stopwatch ── */
+function startTimer() {
+  if (timerRunning) return;
+  if (!currentOpId) {
+     showToast('Dica: Clique em "Editar" numa operação para vincular o tempo a ela.', 'warning');
+  }
+  timerRunning = true;
+  timerInterval = setInterval(() => {
+    timerSeconds++;
+    const el = document.getElementById('stopwatch-display');
+    if (el) el.textContent = formatStopwatch(timerSeconds);
+  }, 1000);
+  document.getElementById('btn-start')?.setAttribute('disabled', true);
+  document.getElementById('btn-stop')?.removeAttribute('disabled');
+}
+
+function stopTimer(sendToBackend = true) {
+  if (!timerRunning) return;
+  clearInterval(timerInterval);
+  timerRunning = false;
+  document.getElementById('btn-start')?.removeAttribute('disabled');
+  document.getElementById('btn-stop')?.setAttribute('disabled', true);
+
+  if (sendToBackend && currentOpId && currentRepair) {
+    const minutes = Math.ceil(timerSeconds / 60);
+    const op = (currentRepair.operacoes || []).find(o => o.id === currentOpId);
+    
+    if (op && minutes > 0) {
+      api.updateOperacao(currentRepair.id, currentOpId, { 
+         descricao: op.descricao,
+         tempoRealMinutos: minutes 
+      })
+      .then(async () => {
+         showToast(`Tempo registado e somado com sucesso!`, 'success');
+         currentRepair = await api.getReparacao(currentRepair.id);
+         timerSeconds = 0; // O tempo já foi somado no backend
+         renderDetailPanel();
+      })
+      .catch(err => showToast('Erro ao guardar tempo: ' + err.message, 'error'));
+    }
+  } else {
+    timerSeconds = 0;
+    const el = document.getElementById('stopwatch-display');
+    if (el) el.textContent = formatStopwatch(0);
+  }
+}
+
+function resetTimer() {
+  stopTimer(false);
+}
+
+/* ── Peças ── */
+async function loadPecas(search) {
+  try {
+    allPecas = await api.getPecas(search) || [];
+    renderPecasTable(allPecas);
+  } catch (err) {
+    const tbody = document.getElementById('pecas-tbody');
+    if (tbody) tbody.innerHTML = `<tr><td colspan="4" class="text-center text-muted">Erro ao carregar peças</td></tr>`;
+  }
+}
+
+function filterPecas(search) {
+  const filtered = search
+    ? allPecas.filter(p =>
+        p.referencia?.toLowerCase().includes(search.toLowerCase()) ||
+        p.designacao?.toLowerCase().includes(search.toLowerCase()))
+    : allPecas;
+  renderPecasTable(filtered);
+}
+
+function renderPecasTable(pecas) {
+  const tbody = document.getElementById('pecas-tbody');
+  if (!tbody) return;
+  if (!pecas.length) {
+    tbody.innerHTML = `<tr><td colspan="4" class="text-center text-muted" style="padding:1rem">Nenhuma peça encontrada</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = pecas.map(p => {
+    const lowStock = p.stockAtual <= p.stockMinimo;
+    return `
+      <tr>
+        <td><code>${escapeHtml(p.referencia)}</code></td>
+        <td>${escapeHtml(p.designacao)} ${lowStock ? '<span class="badge badge-danger">⚠️ Baixo</span>' : ''}</td>
+        <td class="${lowStock ? 'stock-low' : 'stock-ok'}"><strong>${p.stockAtual}</strong></td>
+        <td>
+          <button class="btn btn-primary btn-sm" onclick="openRequisitar(${p.id}, '${escapeHtml(p.designacao)}', ${p.stockAtual})"
+            ${p.stockAtual <= 0 ? 'disabled title="Sem stock"' : ''}>
+            ➕ Requisitar
+          </button>
+        </td>
+      </tr>`;
+  }).join('');
+}
+
+/* ── Requisitar Peça ── */
+function openRequisitar(pecaId, designacao, stock) {
+  document.getElementById('req-peca-id').value   = pecaId;
+  document.getElementById('req-peca-desc').textContent = `${designacao} (Stock: ${stock})`;
+  document.getElementById('req-qty').value        = 1;
+  document.getElementById('req-qty').max          = stock;
+  document.getElementById('req-obs').value        = '';
+  showModal('modal-requisitar');
+}
+
+async function submitRequisicao(e) {
+  e.preventDefault();
+  const pecaId = parseInt(document.getElementById('req-peca-id').value);
+  const qty    = parseInt(document.getElementById('req-qty').value);
+  const obs    = document.getElementById('req-obs').value.trim();
+
+  if (!qty || qty < 1) { showToast('Quantidade inválida.', 'warning'); return; }
+
+  try {
+    await api.requisitarPeca(pecaId, {
+      pecaId:        pecaId,
+      quantidade:    qty,
+      observacoes:   obs || null,
+      reparacaoId:   currentRepair?.id,
+    });
+    showToast('Peça requisitada com sucesso!', 'success');
+    hideModal('modal-requisitar');
+    await loadPecas('');
+  } catch (err) {
+    showToast('Erro: ' + err.message, 'error');
+  }
+}
+
+/* ── Operations Modal ── */
+function openOpModal(opId) {
+  document.getElementById('modal-op-title').textContent = opId ? 'Editar Operação' : 'Nova Operação';
+  document.getElementById('form-op').reset();
+  document.getElementById('op-id').value = opId || '';
+
+  if (opId && currentRepair) {
+    const op = (currentRepair.operacoes || []).find(o => o.id === opId);
+    if (op) {
+      document.getElementById('op-descricao').value = op.descricao || '';
+      document.getElementById('op-tempo').value     = op.tempoEstimadoMinutos || op.tempoEstimado || '';
+      document.getElementById('op-estado').value    = op.estado || 'PENDENTE';
+      
+      currentOpId = opId;
+      renderDetailPanel(); 
+    }
+  } else {
+      currentOpId = null;
+      renderDetailPanel();
+  }
+  showModal('modal-op');
+}
+
+async function submitOperacao(e) {
+  e.preventDefault();
+  if (!currentRepair) return;
+  const id      = document.getElementById('op-id').value;
+  const desc    = document.getElementById('op-descricao').value.trim();
+  const tempo   = document.getElementById('op-tempo').value;
+  const estado  = document.getElementById('op-estado').value;
+
+  const payload = {
+    descricao:      desc,
+    tempoEstimadoMinutos:  tempo ? parseInt(tempo) : null,
+    estado: estado,
+  };
+
+  try {
+    if (id) {
+      await api.updateOperacao(currentRepair.id, id, payload);
+      showToast('Operação atualizada!', 'success');
+    } else {
+      await api.addOperacao(currentRepair.id, payload);
+      showToast('Nova operação adicionada!', 'success');
+    }
+    hideModal('modal-op');
+    currentRepair = await api.getReparacao(currentRepair.id);
+    renderDetailPanel();
+  } catch (err) {
+    showToast('Erro: ' + err.message, 'error');
+  }
+}
+
+async function concluirOperacao(opId) {
+  if (!currentRepair) return;
+  const op = (currentRepair.operacoes || []).find(o => o.id === opId);
+  if (!op) return;
+  try {
+    await api.updateOperacao(currentRepair.id, opId, { 
+       descricao: op.descricao,
+       estado: 'CONCLUIDA' 
+    });
+    showToast('Operação concluída!', 'success');
+    currentRepair = await api.getReparacao(currentRepair.id);
+    renderDetailPanel();
+  } catch (err) {
+    showToast('Erro: ' + err.message, 'error');
+  }
+}
+
+/* ── Concluir Reparação Completa ── */
+async function concluirReparacao() {
+  if (!currentRepair) return;
+
+  const ops       = currentRepair.operacoes || [];
+  const pendentes = ops.filter(o => o.estado !== 'CONCLUIDA');
+
+  if (pendentes.length > 0) {
+    const ok = await confirmDialog(`Existem ${pendentes.length} operação(ões) não concluídas. Deseja concluir a reparação mesmo assim?`);
+    if (!ok) return;
+  } else {
+    const ok = await confirmDialog('Confirma que o trabalho completo da viatura foi concluído?');
+    if (!ok) return;
+  }
+
+  if (timerRunning) stopTimer(true);
+
+  try {
+    await api.updateEstadoReparacao(currentRepair.id, 'CONCLUIDA');
+    showToast('Reparação concluída com sucesso!', 'success');
+    backToDashboard();
+  } catch (err) {
+    showToast('Erro: ' + err.message, 'error');
+  }
+}
+
+async function updateEstado(estado) {
+  if (!currentRepair) return;
+  try {
+    await api.updateEstadoReparacao(currentRepair.id, estado);
+    showToast('Estado alterado!', 'success');
+    currentRepair = await api.getReparacao(currentRepair.id);
+    renderDetailPanel();
+  } catch (err) {
+    showToast('Erro: ' + err.message, 'error');
+  }
+}

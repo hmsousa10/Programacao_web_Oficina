@@ -1,0 +1,471 @@
+/* ========================================================
+   SGO - mecanico.js  |  Mechanic Work Panel (Modern Dashboard)
+   ======================================================== */
+
+'use strict';
+
+const CHECKLIST_ITEMS = [
+  'Verificação de óleo', 'Verificação de travões', 'Verificação de suspensão',
+  'Verificação de pneus', 'Diagnóstico eletrónico', 'Verificação de luzes',
+  'Verificação de fluidos', 'Verificação de bateria',
+];
+
+let allRepairs      = [];
+let currentRepair   = null;
+let allPecas        = [];
+let timerInterval   = null;
+let timerSeconds    = 0;
+let timerRunning    = false;
+let currentOpId     = null; // Operação que está a ser cronometrada
+
+document.addEventListener('DOMContentLoaded', async () => {
+  if (!initProtectedPage(['MECHANIC', 'MANAGER'])) return;
+  
+  if (typeof initMobileSidebar === 'function') {
+    initMobileSidebar(); // Ativa os 3 tracinhos para navegação
+  }
+  
+  await loadMyRepairs();
+});
+
+/* ── Load mechanic's repairs & Update KPIs ── */
+async function loadMyRepairs() {
+  const user = getCurrentUser();
+  const listEl = document.getElementById('repair-list'); 
+  
+  if (!user || !user.id) {
+    if (listEl) listEl.innerHTML = `<tr><td colspan="6"><div class="alert alert-warning">Sessão inválida. Por favor, faça login novamente.</div></td></tr>`;
+    showToast("ID do utilizador não encontrado.", "error");
+    return;
+  }
+  
+  const countEl = document.getElementById('repair-count');
+  if (listEl) {
+    listEl.innerHTML = `<tr><td colspan="6"><div class="loading-overlay" style="position:relative; height: 100px;"><div class="spinner"></div></div></td></tr>`;
+  }
+
+  try {
+    const data = await api.getReparacoesMecanico(user.id);
+    
+    // O Backend usa EM_EXECUCAO ou EM_PROGRESSO dependendo da versão
+    allRepairs = (data || []).filter(r => ['PENDENTE', 'EM_EXECUCAO', 'EM_PROGRESSO', 'AGUARDA_PECAS'].includes(r.estado));
+    
+    // 1. Atualizar contagem total na tabela
+    if (countEl) countEl.textContent = `${allRepairs.length} Trabalhos`;
+
+    // 2. Atualizar KPIs (Cartões no topo)
+    const pendentes = allRepairs.filter(r => r.estado === 'PENDENTE').length;
+    const progresso = allRepairs.filter(r => ['EM_EXECUCAO', 'EM_PROGRESSO'].includes(r.estado)).length;
+    const pecas     = allRepairs.filter(r => r.estado === 'AGUARDA_PECAS').length;
+
+    const elPendentes = document.getElementById('kpi-pendentes');
+    const elProgresso = document.getElementById('kpi-progresso');
+    const elPecas     = document.getElementById('kpi-pecas');
+
+    if (elPendentes) elPendentes.textContent = pendentes;
+    if (elProgresso) elProgresso.textContent = progresso;
+    if (elPecas)     elPecas.textContent     = pecas;
+
+    renderRepairList();
+  } catch (err) {
+    if (listEl) {
+      listEl.innerHTML = `<tr><td colspan="6"><div class="alert alert-danger"><span class="alert-icon">❌</span> ${escapeHtml(err.message)}</div></td></tr>`;
+    }
+  }
+}
+
+/* ── Render Fila de Trabalho (Tabela) ── */
+function renderRepairList() {
+  const listEl = document.getElementById('repair-list');
+  if (!listEl) return;
+
+  if (!allRepairs.length) {
+    listEl.innerHTML = `<tr><td colspan="6" style="text-align:center; padding: 2rem;">✅ Sem reparações atribuídas na fila de trabalho.</td></tr>`;
+    return;
+  }
+
+  listEl.innerHTML = allRepairs.map(r => {
+    const isActive = currentRepair?.id === r.id;
+    return `
+      <tr class="${isActive ? 'active-row' : ''}">
+        <td><strong>${escapeHtml(r.viaturaMatricula || '#' + r.id)}</strong></td>
+        <td>${escapeHtml(r.viaturaMarca || '—')} ${escapeHtml(r.viaturaModelo || '')}</td>
+        <td>👤 ${escapeHtml(r.clienteNome || '—')}</td>
+        <td>${formatDate(r.dataInicio || r.dataEntrada || '')}</td>
+        <td>${getStatusBadge(r.estado)}</td>
+        <td>
+          <button class="btn btn-sm ${isActive ? 'btn-primary' : 'btn-secondary'}" onclick="selectReparacao(${r.id})">
+            ${isActive ? '👁️ A Visualizar' : 'Ver Detalhes'}
+          </button>
+        </td>
+      </tr>`;
+  }).join('');
+}
+
+/* ── Select a repair ── */
+async function selectReparacao(id) {
+  if (timerRunning && currentRepair?.id !== id) stopTimer(false);
+  try {
+    currentRepair = await api.getReparacao(id);
+    renderRepairList(); // Atualiza a tabela para destacar a linha ativa
+    renderDetailPanel();
+    await loadPecas('');
+    
+    // Fazer scroll automático para os detalhes em ecrãs pequenos
+    if (window.innerWidth <= 1024) {
+        document.getElementById('detail-panel')?.scrollIntoView({ behavior: 'smooth' });
+    }
+  } catch (err) {
+    showToast('Erro ao carregar reparação: ' + err.message, 'error');
+  }
+}
+
+/* ── Render Detail Panel ── */
+function renderDetailPanel() {
+  const panel = document.getElementById('detail-panel');
+  if (!panel || !currentRepair) return;
+  const r = currentRepair;
+
+  panel.innerHTML = `
+    <div class="two-col-layout" style="gap:1rem; margin-bottom: 1rem;">
+      <div class="card p-0">
+        <div class="card-header"><h3 class="card-title">🚗 Viatura</h3></div>
+        <div class="card-body">
+          <div class="info-grid">
+            <div class="info-item"><span class="info-label">Matrícula</span><span class="info-value"><strong>${escapeHtml(r.viaturaMatricula)}</strong></span></div>
+            <div class="info-item"><span class="info-label">Marca/Modelo</span><span class="info-value">${escapeHtml(r.viaturaMarca || '—')} ${escapeHtml(r.viaturaModelo || '')}</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="card p-0">
+        <div class="card-header"><h3 class="card-title">👤 Cliente</h3></div>
+        <div class="card-body">
+          <div class="info-grid">
+            <div class="info-item"><span class="info-label">Nome</span><span class="info-value">${escapeHtml(r.clienteNome)}</span></div>
+            <div class="info-item"><span class="info-label">Estado</span><span class="info-value">${getStatusBadge(r.estado)}</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="stopwatch card p-3" style="margin-bottom: 1rem; text-align: center; border-left: 4px solid var(--primary-color);">
+      <div class="stopwatch-display" id="stopwatch-display" style="font-size: 2rem; font-weight: bold; margin-bottom: 0.5rem;">${formatStopwatch(timerSeconds)}</div>
+      <div class="stopwatch-controls" style="display: flex; gap: 0.5rem; justify-content: center;">
+        <button class="btn btn-success" id="btn-start" onclick="startTimer()">▶ Iniciar</button>
+        <button class="btn btn-warning" id="btn-stop" onclick="stopTimer(true)" disabled>⏸ Parar</button>
+        <button class="btn btn-secondary" onclick="resetTimer()">↺ Reiniciar</button>
+      </div>
+      <p style="margin-top:.75rem; font-size:.8rem; color: var(--text-muted);">Cronómetro da operação atual</p>
+    </div>
+
+    <div class="card p-0" style="margin-bottom: 1rem;">
+      <div class="card-header" style="display: flex; justify-content: space-between;"><h3 class="card-title">🔩 Operações</h3><button class="btn btn-primary btn-sm" onclick="openOpModal()">+ Adicionar</button></div>
+      <div class="card-body"><div id="op-list">${renderOperacoes(r.operacoes || [])}</div></div>
+    </div>
+
+    <div class="card p-0" style="margin-bottom: 1rem;">
+      <div class="card-header" style="display: flex; justify-content: space-between;"><h3 class="card-title">✅ Checklist Diagnóstico</h3><button class="btn btn-secondary btn-sm" onclick="clearChecklist()">Limpar</button></div>
+      <div class="card-body"><div class="checklist" id="checklist" style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">${renderChecklist()}</div></div>
+    </div>
+
+    <div class="card p-0" style="margin-bottom: 1rem;">
+      <div class="card-header"><h3 class="card-title">📦 Requisitar Peças</h3></div>
+      <div class="card-body">
+        <input type="text" class="form-control" id="peca-search" placeholder="Pesquisar peça pela referência ou nome…" oninput="filterPecas(this.value)" style="margin-bottom:.75rem; width: 100%;">
+        <div class="table-wrapper" style="max-height:200px; overflow-y:auto;">
+          <table class="modern-table">
+            <thead><tr><th>Ref</th><th>Peça</th><th>Stock</th><th></th></tr></thead>
+            <tbody id="pecas-tbody"><tr><td colspan="4" class="text-center">A carregar…</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex; justify-content:flex-end; gap:.75rem; padding-top:1rem; border-top: 1px solid var(--border-color);">
+      ${r.estado !== 'CONCLUIDA' ? `
+        <button class="btn btn-warning" onclick="updateEstado('AGUARDA_PECAS')">📦 Aguarda Peças</button>
+        <button class="btn btn-success btn-lg" onclick="concluirReparacao()">✅ Concluir Trabalho</button>
+      ` : `<span class="badge badge-success" style="padding: 0.75rem 1rem; font-size: 1rem;">Trabalho Concluído</span>`}
+    </div>
+  `;
+
+  if (timerRunning) {
+    document.getElementById('btn-start')?.setAttribute('disabled', true);
+    document.getElementById('btn-stop')?.removeAttribute('disabled');
+  }
+}
+
+/* ── Operações ── */
+function renderOperacoes(operacoes) {
+  if (!operacoes.length) return `<p class="text-muted" style="text-align:center; margin: 1rem 0;">Nenhuma operação registada. Adicione uma para começar.</p>`;
+  
+  return operacoes.map(op => `
+    <div class="op-item" style="margin-bottom:.5rem; padding: 0.75rem; border: 1px solid var(--border-color); border-radius: 6px; display: flex; justify-content: space-between; align-items: center; background: var(--bg-color);">
+      <div class="op-info">
+        <div class="op-desc" style="font-weight: 500;">${escapeHtml(op.descricao)}</div>
+        <div class="op-meta" style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.25rem;">
+          ⏱ ${formatDuration(op.tempoEstimadoMinutos || op.tempoEstimado || 0)} 
+          ${op.valor ? ' | ' + formatCurrency(op.valor) : ''}
+        </div>
+      </div>
+      <div style="display:flex; gap:.4rem; align-items:center">
+        ${getStatusBadge(op.estado || 'NAO_INICIADA')}
+        <button class="btn btn-secondary btn-sm" onclick="openOpModal(${op.id})" title="Editar">✏️</button>
+        ${op.estado !== 'CONCLUIDA' && op.estado !== 'CONCLUIDA_OP' ? `<button class="btn btn-success btn-sm" onclick="concluirOperacao(${op.id})" title="Marcar como Concluída">✅</button>` : ''}
+      </div>
+    </div>`).join('');
+}
+
+async function concluirOperacao(opId) {
+  if (!currentRepair) return;
+  try {
+    // O backend de operações pode usar CONCLUIDA_OP ou CONCLUIDA
+    await api.updateOperacao(currentRepair.id, opId, { estado: 'CONCLUIDA' });
+    showToast('Operação concluída!', 'success');
+    currentRepair = await api.getReparacao(currentRepair.id);
+    renderDetailPanel();
+  } catch (err) {
+    showToast('Erro: ' + err.message, 'error');
+  }
+}
+
+/* ── Checklist ── */
+function getChecklistKey() { return `sgo_checklist_${currentRepair?.id || 'generic'}`; }
+
+function renderChecklist() {
+  const saved = JSON.parse(localStorage.getItem(getChecklistKey()) || '{}');
+  return CHECKLIST_ITEMS.map((item, i) => {
+    const checked = saved[i] || false;
+    return `
+      <div class="checklist-item ${checked ? 'checked' : ''}" onclick="toggleChecklistItem(${i}, this)" style="padding: 0.5rem; border: 1px solid var(--border-color); border-radius: 4px; cursor: pointer; display: flex; gap: 0.5rem; align-items: center; transition: all 0.2s;">
+        <input type="checkbox" id="chk-${i}" ${checked ? 'checked' : ''} onchange="toggleChecklistItem(${i}, this.closest('.checklist-item'))" style="pointer-events: none;">
+        <label for="chk-${i}" style="margin: 0; pointer-events: none; ${checked ? 'text-decoration: line-through; color: var(--text-muted);' : ''}">${escapeHtml(item)}</label>
+      </div>`;
+  }).join('');
+}
+
+function toggleChecklistItem(index, itemEl) {
+  const key = getChecklistKey();
+  const saved = JSON.parse(localStorage.getItem(key) || '{}');
+  saved[index] = !saved[index];
+  localStorage.setItem(key, JSON.stringify(saved));
+  if (itemEl) {
+    itemEl.classList.toggle('checked', saved[index]);
+    const chk = itemEl.querySelector('input[type="checkbox"]');
+    const label = itemEl.querySelector('label');
+    if (chk) chk.checked = saved[index];
+    if (label) {
+      if(saved[index]){
+          label.style.textDecoration = 'line-through';
+          label.style.color = 'var(--text-muted)';
+      } else {
+          label.style.textDecoration = 'none';
+          label.style.color = 'inherit';
+      }
+    }
+  }
+}
+
+function clearChecklist() {
+  localStorage.removeItem(getChecklistKey());
+  const cl = document.getElementById('checklist');
+  if (cl) cl.innerHTML = renderChecklist();
+}
+
+/* ── Stopwatch ── */
+function startTimer() {
+  if (timerRunning) return;
+  timerRunning = true;
+  timerInterval = setInterval(() => {
+    timerSeconds++;
+    const el = document.getElementById('stopwatch-display');
+    if (el) el.textContent = formatStopwatch(timerSeconds);
+  }, 1000);
+  document.getElementById('btn-start')?.setAttribute('disabled', true);
+  document.getElementById('btn-stop')?.removeAttribute('disabled');
+}
+
+function stopTimer(sendToBackend = true) {
+  if (!timerRunning) return;
+  clearInterval(timerInterval);
+  timerRunning = false;
+  document.getElementById('btn-start')?.removeAttribute('disabled');
+  document.getElementById('btn-stop')?.setAttribute('disabled', true);
+  if (sendToBackend && currentOpId && currentRepair) {
+    const minutes = Math.ceil(timerSeconds / 60);
+    api.updateOperacao(currentRepair.id, currentOpId, { tempoRealMinutos: minutes })
+      .then(() => showToast(`Tempo registado: ${formatDuration(minutes)}`, 'success'))
+      .catch(err => showToast('Erro ao guardar tempo: ' + err.message, 'error'));
+  }
+}
+
+function resetTimer() { 
+    stopTimer(false); 
+    timerSeconds = 0; 
+    const el = document.getElementById('stopwatch-display'); 
+    if (el) el.textContent = formatStopwatch(0); 
+}
+
+/* ── Peças ── */
+async function loadPecas(search) {
+  try {
+    allPecas = await api.getPecas(search) || [];
+    renderPecasTable(allPecas);
+  } catch {
+    const tbody = document.getElementById('pecas-tbody');
+    if (tbody) tbody.innerHTML = `<tr><td colspan="4" class="text-center text-danger">Erro ao carregar peças.</td></tr>`;
+  }
+}
+
+function filterPecas(search) {
+  if (!allPecas || !allPecas.length) return;
+  const filtered = allPecas.filter(p => 
+      (p.referencia && p.referencia.toLowerCase().includes(search.toLowerCase())) || 
+      (p.designacao && p.designacao.toLowerCase().includes(search.toLowerCase()))
+  );
+  renderPecasTable(filtered);
+}
+
+function renderPecasTable(pecas) {
+  const tbody = document.getElementById('pecas-tbody');
+  if (!tbody) return;
+  
+  if(!pecas || !pecas.length){
+     tbody.innerHTML = `<tr><td colspan="4" class="text-center text-muted">Nenhuma peça encontrada.</td></tr>`;
+     return;
+  }
+  
+  tbody.innerHTML = pecas.map(p => {
+    const lowStock = p.stockAtual <= p.stockMinimo;
+    return `
+    <tr>
+      <td><code>${escapeHtml(p.referencia)}</code></td>
+      <td>${escapeHtml(p.designacao)}</td>
+      <td>
+        <span class="badge ${lowStock ? 'badge-danger' : 'badge-success'}">${p.stockAtual}</span>
+      </td>
+      <td>
+        <button class="btn btn-primary btn-sm" onclick="openRequisitar(${p.id}, '${escapeHtml(p.designacao.replace(/'/g, "\\'"))}', ${p.stockAtual})" ${p.stockAtual <= 0 ? 'disabled title="Sem stock"' : ''}>
+          Req
+        </button>
+      </td>
+    </tr>`
+  }).join('');
+}
+
+function openRequisitar(pecaId, desc, stock) {
+  document.getElementById('req-peca-id').value = pecaId;
+  document.getElementById('req-peca-desc').textContent = `${desc} (Stock Disponível: ${stock})`;
+  document.getElementById('req-qty').value = 1;
+  document.getElementById('req-qty').max = stock; // Não permite pedir mais do que o stock
+  document.getElementById('req-obs').value = '';
+  showModal('modal-requisitar');
+}
+
+async function submitRequisicao(e) {
+  e.preventDefault();
+  const qty = parseInt(document.getElementById('req-qty').value);
+  if (qty <= 0 || isNaN(qty)) {
+      showToast('Quantidade inválida', 'warning');
+      return;
+  }
+  
+  const data = { 
+      pecaId: document.getElementById('req-peca-id').value, 
+      quantidade: qty, 
+      observacoes: document.getElementById('req-obs').value, 
+      reparacaoId: currentRepair.id 
+  };
+  
+  try {
+    await api.requisitarPeca(data.pecaId, data);
+    showToast('Peça requisitada com sucesso!', 'success');
+    hideModal('modal-requisitar');
+    await loadPecas(''); // Recarrega para ver stock atualizado
+  } catch (err) { 
+      showToast('Erro ao requisitar peça: ' + err.message, 'error'); 
+  }
+}
+
+/* ── Modais de Operação ── */
+function openOpModal(opId) {
+  document.getElementById('modal-op-title').textContent = opId ? 'Editar Operação' : 'Nova Operação';
+  document.getElementById('form-op').reset();
+  document.getElementById('op-id').value = opId || '';
+  
+  if (opId && currentRepair && currentRepair.operacoes) {
+    const op = currentRepair.operacoes.find(o => o.id === opId);
+    if (op) {
+      document.getElementById('op-descricao').value = op.descricao || '';
+      document.getElementById('op-tempo').value = op.tempoEstimadoMinutos || op.tempoEstimado || '';
+      document.getElementById('op-valor').value = op.valor || '';
+      document.getElementById('op-estado').value = op.estado || 'NAO_INICIADA';
+      currentOpId = opId;
+    }
+  }
+  showModal('modal-op');
+}
+
+async function submitOperacao(e) {
+  e.preventDefault();
+  
+  const tempo = document.getElementById('op-tempo').value;
+  const valor = document.getElementById('op-valor').value;
+  
+  const payload = {
+    descricao: document.getElementById('op-descricao').value,
+    tempoEstimadoMinutos: tempo ? parseInt(tempo) : null,
+    valor: valor ? parseFloat(valor) : null,
+    estado: document.getElementById('op-estado').value
+  };
+  
+  // Retrocompatibilidade caso o backend use "tempoEstimado" em vez de "tempoEstimadoMinutos"
+  payload.tempoEstimado = payload.tempoEstimadoMinutos;
+  
+  const opId = document.getElementById('op-id').value;
+  
+  try {
+    if (opId) {
+        await api.updateOperacao(currentRepair.id, opId, payload);
+    } else {
+        await api.addOperacao(currentRepair.id, payload);
+    }
+    
+    showToast('Operação guardada!', 'success');
+    hideModal('modal-op');
+    currentRepair = await api.getReparacao(currentRepair.id);
+    renderDetailPanel();
+  } catch (err) { 
+      showToast('Erro: ' + err.message, 'error'); 
+  }
+}
+
+/* ── Estado Global da Reparação ── */
+async function updateEstado(estado) {
+  try {
+    await api.updateEstadoReparacao(currentRepair.id, estado);
+    showToast('Estado da viatura atualizado!', 'success');
+    currentRepair = await api.getReparacao(currentRepair.id);
+    renderDetailPanel();
+    await loadMyRepairs(); // Atualiza os KPIs e a tabela
+  } catch (err) { 
+      showToast('Erro: ' + err.message, 'error'); 
+  }
+}
+
+async function concluirReparacao() {
+  // Verifica se há operações não concluídas
+  const ops = currentRepair.operacoes || [];
+  const pendentes = ops.filter(o => o.estado !== 'CONCLUIDA' && o.estado !== 'CONCLUIDA_OP');
+  
+  let msg = 'Tem a certeza que deseja concluir este trabalho?';
+  if (pendentes.length > 0) {
+      msg = `Atenção: Existem ${pendentes.length} operação(ões) que ainda não foram marcadas como concluídas.\n\nDeseja forçar a conclusão do trabalho mesmo assim?`;
+  }
+
+  const ok = await confirmDialog(msg);
+  if (!ok) return;
+  
+  if (timerRunning) stopTimer(true);
+  await updateEstado('CONCLUIDA');
+}

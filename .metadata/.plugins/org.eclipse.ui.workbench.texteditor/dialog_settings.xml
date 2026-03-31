@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<section name="Workbench">
+	<section name="java.lang.Class">
+		<item key="replaceBarOpen" value="false"/>
+		<list key="findhistory">
+			<item value="updateEstado"/>
+			<item value="EstadoReparacao"/>
+			<item value="openCreatePeca"/>
+			<item value="openEditPeca"/>
+			<item value="private ReparacaoResponse toResponse(Reparacao r"/>
+			<item value="renderRepairList"/>
+			<item value="se"/>
+			<item value="Tablet"/>
+			<item value="tbody.innerHTML"/>
+			<item value="handleException"/>
+			<item value="private ViaturaResponse toResponse(Viatura v) {"/>
+			<item value="update"/>
+			<item value="create"/>
+			<item value="Viatura.java)"/>
+			<item value="String path = req.getServletPath();&#x0A;if (path.startsWith(&quot;/api/auth/&quot;)) {&#x0A;    chain.doFilter(request, response);&#x0A;    retrn;&#x0A;}"/>
+		</list>
+	</section>
+</section>
